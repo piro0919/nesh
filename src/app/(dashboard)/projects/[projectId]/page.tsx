@@ -1,19 +1,10 @@
+import { Bell, Send, Users, Webhook } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FREE_TIER, startOfCurrentMonthUtc } from "@/lib/limits";
-import { getSiteUrl } from "@/lib/site-url";
 import { createClient } from "@/lib/supabase/server";
-import { AnalyticsChart } from "./_components/analytics-chart";
-import { ApiKeyCard } from "./_components/api-key-card";
-import { DefaultsCard } from "./_components/defaults-card";
-import { DeleteProjectButton } from "./_components/delete-button";
-import { ExportCard } from "./_components/export-card";
-import { NotificationsList } from "./_components/notifications-list";
-import { ProjectName } from "./_components/project-name";
-import { SdkSetup } from "./_components/sdk-setup";
-import { WebhooksCard } from "./_components/webhook-card";
 
 type Props = { params: Promise<{ projectId: string }> };
 
@@ -23,179 +14,154 @@ export default async function Page({ params }: Props) {
 
   const { data: project, error } = await supabase
     .from("projects")
-    .select(
-      "id, name, vapid_public_key, vapid_subject, api_key, created_at, default_icon, default_badge",
-    )
+    .select("id, name, created_at")
     .eq("id", projectId)
     .maybeSingle();
-
   if (error) throw error;
   if (!project) notFound();
 
-  const { count: subscriberCount } = await supabase
-    .from("subscriptions")
-    .select("*", { head: true, count: "exact" })
-    .eq("project_id", project.id);
+  const monthStart = startOfCurrentMonthUtc().toISOString();
 
-  const { count: monthlySendCount } = await supabase
-    .from("notifications")
-    .select("*", { head: true, count: "exact" })
-    .eq("project_id", project.id)
-    .gte("created_at", startOfCurrentMonthUtc().toISOString());
+  const [{ count: subscriberCount }, { count: monthlySendCount }, { data: agg }, { data: recent }] =
+    await Promise.all([
+      supabase
+        .from("subscriptions")
+        .select("*", { head: true, count: "exact" })
+        .eq("project_id", project.id),
+      supabase
+        .from("notifications")
+        .select("*", { head: true, count: "exact" })
+        .eq("project_id", project.id)
+        .gte("created_at", monthStart),
+      supabase.from("notifications").select("shown, clicked").eq("project_id", project.id),
+      supabase
+        .from("notifications")
+        .select("id, title, created_at, shown, clicked")
+        .eq("project_id", project.id)
+        .order("created_at", { ascending: false })
+        .limit(5),
+    ]);
 
-  const { data: webhooks } = await supabase
-    .from("webhooks")
-    .select(
-      "id, name, url, secret, enabled, events, last_delivery_at, last_delivery_status, last_delivery_error",
-    )
-    .eq("project_id", project.id)
-    .order("created_at", { ascending: true });
+  const totals = (agg ?? []).reduce(
+    (acc, n) => {
+      acc.shown += n.shown ?? 0;
+      acc.clicked += n.clicked ?? 0;
+      return acc;
+    },
+    { shown: 0, clicked: 0 },
+  );
+  const ctr = totals.shown > 0 ? (totals.clicked / totals.shown) * 100 : 0;
 
-  const webhookIds = (webhooks ?? []).map((w) => w.id);
-  const { data: deliveries } =
-    webhookIds.length > 0
-      ? await supabase
-          .from("webhook_deliveries")
-          .select(
-            "id, webhook_id, event_type, status_code, error, created_at, attempts, next_attempt_at",
-          )
-          .in("webhook_id", webhookIds)
-          .order("created_at", { ascending: false })
-          .limit(200)
-      : {
-          data: [] as Array<{
-            id: string;
-            webhook_id: string;
-            event_type: string;
-            status_code: number | null;
-            error: string | null;
-            created_at: string;
-            attempts: number;
-            next_attempt_at: string | null;
-          }>,
-        };
-
-  const deliveriesByWebhook: Record<string, NonNullable<typeof deliveries>> = {};
-  for (const d of deliveries ?? []) {
-    if (!deliveriesByWebhook[d.webhook_id]) deliveriesByWebhook[d.webhook_id] = [];
-    deliveriesByWebhook[d.webhook_id].push(d);
-  }
-  // Cap each webhook's list to 20 most recent for the UI.
-  for (const k of Object.keys(deliveriesByWebhook)) {
-    deliveriesByWebhook[k] = deliveriesByWebhook[k].slice(0, 20);
-  }
-
-  const { data: errors } = await supabase
-    .from("error_logs")
-    .select("id, context, message, created_at")
-    .eq("project_id", project.id)
-    .order("created_at", { ascending: false })
-    .limit(10);
-
-  const apiBase = `${getSiteUrl()}/api/v1/projects/${project.id}`;
   const subs = subscriberCount ?? 0;
   const sends = monthlySendCount ?? 0;
 
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
-      <div className="flex items-center justify-between">
-        <ProjectName projectId={project.id} name={project.name} />
-        <div className="flex items-center gap-2">
-          <Button asChild>
-            <Link href={`/projects/${project.id}/notifications/new`}>Send notification</Link>
-          </Button>
-          <DeleteProjectButton projectId={project.id} projectName={project.name} />
+    <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold">{project.name}</h1>
+          <p className="text-xs text-muted-foreground">
+            Created {new Date(project.created_at).toLocaleDateString()}
+          </p>
         </div>
+        <Button asChild>
+          <Link href={`/projects/${project.id}/notifications/new`}>
+            <Send /> Send notification
+          </Link>
+        </Button>
       </div>
+
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <Stat
+          label="Subscribers"
+          value={subs.toLocaleString()}
+          sub={`/ ${FREE_TIER.SUBSCRIBERS_PER_PROJECT.toLocaleString()}`}
+          href={`/projects/${project.id}/subscribers`}
+          icon={<Users className="h-4 w-4" />}
+        />
+        <Stat
+          label="Sends this month"
+          value={sends.toLocaleString()}
+          sub={`/ ${FREE_TIER.NOTIFICATIONS_PER_MONTH.toLocaleString()}`}
+          href={`/projects/${project.id}/notifications`}
+          icon={<Send className="h-4 w-4" />}
+        />
+        <Stat
+          label="Total shown"
+          value={totals.shown.toLocaleString()}
+          href={`/projects/${project.id}/analytics`}
+          icon={<Bell className="h-4 w-4" />}
+        />
+        <Stat
+          label="Click-through rate"
+          value={`${ctr.toFixed(1)}%`}
+          sub={`${totals.clicked.toLocaleString()} clicks`}
+          href={`/projects/${project.id}/analytics`}
+          icon={<Webhook className="h-4 w-4" />}
+        />
+      </div>
+
       <Card>
-        <CardHeader>
-          <CardTitle>Project info</CardTitle>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle>Recent notifications</CardTitle>
+          <Button asChild variant="ghost" size="sm">
+            <Link href={`/projects/${project.id}/notifications`}>View all →</Link>
+          </Button>
         </CardHeader>
-        <CardContent className="grid gap-2 text-sm">
-          <Row label="ID" value={project.id} mono />
-          <Row label="Created" value={new Date(project.created_at).toLocaleString()} />
-          <Row label="VAPID subject" value={project.vapid_subject} mono />
-          <div>
-            <span className="text-muted-foreground">Subscribers: </span>
-            <span>
-              {subs.toLocaleString()} / {FREE_TIER.SUBSCRIBERS_PER_PROJECT.toLocaleString()}
-            </span>
-            {subs > 0 ? (
-              <>
-                {" · "}
-                <Link
-                  href={`/projects/${project.id}/subscribers`}
-                  className="underline-offset-2 hover:underline"
-                >
-                  Manage
-                </Link>
-              </>
-            ) : null}
-          </div>
-          <Row
-            label="Sends this month (UTC)"
-            value={`${sends.toLocaleString()} / ${FREE_TIER.NOTIFICATIONS_PER_MONTH.toLocaleString()}`}
-          />
+        <CardContent className="p-0">
+          {(recent?.length ?? 0) === 0 ? (
+            <p className="p-6 text-sm text-muted-foreground">No notifications sent yet.</p>
+          ) : (
+            <ul className="divide-y">
+              {(recent ?? []).map((n) => (
+                <li key={n.id} className="flex items-center justify-between gap-4 px-6 py-3">
+                  <div className="min-w-0">
+                    <div className="truncate text-sm font-medium">{n.title}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {new Date(n.created_at).toLocaleString()}
+                    </div>
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {(n.shown ?? 0).toLocaleString()} shown · {(n.clicked ?? 0).toLocaleString()}{" "}
+                    clicked
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
         </CardContent>
       </Card>
-      <AnalyticsChart projectId={project.id} />
-      <SdkSetup apiBase={apiBase} publicKey={project.vapid_public_key} />
-      <ApiKeyCard projectId={project.id} apiKey={project.api_key} apiBase={apiBase} />
-      <DefaultsCard
-        projectId={project.id}
-        defaultIcon={project.default_icon}
-        defaultBadge={project.default_badge}
-      />
-      <WebhooksCard
-        projectId={project.id}
-        webhooks={webhooks ?? []}
-        deliveriesByWebhook={deliveriesByWebhook}
-      />
-      <ExportCard projectId={project.id} />
-      <ErrorsCard errors={errors ?? []} />
-      <NotificationsList projectId={project.id} />
     </div>
   );
 }
 
-function ErrorsCard({
-  errors,
+function Stat({
+  label,
+  value,
+  sub,
+  href,
+  icon,
 }: {
-  errors: Array<{ id: string; context: string; message: string; created_at: string }>;
+  label: string;
+  value: string;
+  sub?: string;
+  href: string;
+  icon: React.ReactNode;
 }) {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Recent errors</CardTitle>
-      </CardHeader>
-      <CardContent>
-        {errors.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No errors logged.</p>
-        ) : (
-          <ul className="flex flex-col gap-1 text-xs">
-            {errors.map((e) => (
-              <li key={e.id} className="flex items-baseline gap-3 border-b py-1 last:border-b-0">
-                <span className="text-muted-foreground">
-                  {new Date(e.created_at).toLocaleString()}
-                </span>
-                <code className="text-xs">{e.context}</code>
-                <span className="truncate text-destructive" title={e.message}>
-                  {e.message}
-                </span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </CardContent>
-    </Card>
-  );
-}
-
-function Row({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
-  return (
-    <div>
-      <span className="text-muted-foreground">{label}: </span>
-      {mono ? <code className="text-xs">{value}</code> : <span>{value}</span>}
-    </div>
+    <Link href={href} className="block">
+      <Card className="transition hover:border-foreground/20">
+        <CardContent className="flex flex-col gap-1 p-4">
+          <div className="flex items-center justify-between text-xs text-muted-foreground">
+            <span>{label}</span>
+            {icon}
+          </div>
+          <div className="flex items-baseline gap-1">
+            <span className="text-2xl font-semibold">{value}</span>
+            {sub ? <span className="text-xs text-muted-foreground">{sub}</span> : null}
+          </div>
+        </CardContent>
+      </Card>
+    </Link>
   );
 }
