@@ -11,7 +11,10 @@ export function SdkSetup({ apiBase, publicKey }: Props) {
 
 const { subscribe } = usePush({
   apiBase: "${apiBase}",
-  publicKey: "${publicKey}",
+  vapidPublicKey: "${publicKey}",
+  // Optional: scope this subscription to your own user identity
+  // so you can target sends by user id from the dashboard / REST API.
+  // userId: currentUser.id,
 });`;
 
   return (

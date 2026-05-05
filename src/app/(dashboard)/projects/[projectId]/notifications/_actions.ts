@@ -19,6 +19,21 @@ export async function createNotification(
   const urlRaw = String(formData.get("url") ?? "").trim();
   const scheduledAtRaw = String(formData.get("scheduled_at") ?? "").trim();
   const mode = String(formData.get("mode") ?? "immediate");
+  const targetRaw = String(formData.get("target_user_ids") ?? "").trim();
+  const targetUserIds =
+    targetRaw === ""
+      ? null
+      : Array.from(
+          new Set(
+            targetRaw
+              .split(/[\s,]+/)
+              .map((s) => s.trim())
+              .filter((s) => s.length > 0 && s.length <= 256),
+          ),
+        );
+  if (targetUserIds && targetUserIds.length > 1000) {
+    return { error: "Too many target user ids (max 1,000)" };
+  }
 
   const parsed = notificationPayloadSchema.safeParse({
     title,
@@ -61,6 +76,7 @@ export async function createNotification(
       url: parsed.data.url ?? null,
       scheduled_at: scheduledAt,
       status: "pending",
+      target_user_ids: targetUserIds,
     })
     .select("id")
     .single();

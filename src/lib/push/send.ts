@@ -25,16 +25,20 @@ export async function sendToProject(
 
   const { data: notification, error: notificationError } = await supabase
     .from("notifications")
-    .select("title, body, url")
+    .select("title, body, url, target_user_ids")
     .eq("id", notificationId)
     .maybeSingle();
   if (notificationError) throw notificationError;
   if (!notification) throw new Error("Notification not found");
 
-  const { data: subscriptions, error: subsError } = await supabase
+  let query = supabase
     .from("subscriptions")
     .select("id, endpoint, p256dh, auth")
     .eq("project_id", projectId);
+  if (notification.target_user_ids && notification.target_user_ids.length > 0) {
+    query = query.in("external_user_id", notification.target_user_ids);
+  }
+  const { data: subscriptions, error: subsError } = await query;
   if (subsError) throw subsError;
 
   const privateKey = isEncrypted(project.vapid_private_key)

@@ -87,7 +87,7 @@ import { usePush } from "@piro0919/next-push";
 export function Subscribe() {
   const { subscribe } = usePush({
     apiBase: "https://nesh.kkweb.io/api/v1/projects/<projectId>",
-    publicKey: "<VAPID public key>",
+    vapidPublicKey: "<VAPID public key>",
   });
   return <button onClick={subscribe}>Enable notifications</button>;
 }`}</code>
