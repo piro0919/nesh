@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { signOut } from "@/app/(auth)/_actions";
 import { Button } from "@/components/ui/button";
@@ -8,7 +9,8 @@ export default async function DashboardLayout({ children }: { children: React.Re
   return (
     <div className="flex min-h-screen flex-col">
       <header className="flex items-center justify-between border-b px-6 py-3">
-        <Link href="/projects" className="font-semibold">
+        <Link href="/projects" className="flex items-center gap-2 font-semibold">
+          <Image src="/logo.png" alt="" width={24} height={24} className="rounded" />
           Nesh
         </Link>
         <div className="flex items-center gap-3 text-sm">
