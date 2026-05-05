@@ -56,7 +56,9 @@ export default async function Page({ params }: Props) {
     webhookIds.length > 0
       ? await supabase
           .from("webhook_deliveries")
-          .select("id, webhook_id, event_type, status_code, error, created_at")
+          .select(
+            "id, webhook_id, event_type, status_code, error, created_at, attempts, next_attempt_at",
+          )
           .in("webhook_id", webhookIds)
           .order("created_at", { ascending: false })
           .limit(200)
@@ -68,6 +70,8 @@ export default async function Page({ params }: Props) {
             status_code: number | null;
             error: string | null;
             created_at: string;
+            attempts: number;
+            next_attempt_at: string | null;
           }>,
         };
 
