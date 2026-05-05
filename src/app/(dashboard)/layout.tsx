@@ -14,7 +14,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
           Nesh
         </Link>
         <div className="flex items-center gap-3 text-sm">
-          <span className="text-muted-foreground">{user.email}</span>
+          <Link href="/account" className="text-muted-foreground hover:text-foreground">
+            {user.email}
+          </Link>
           <form action={signOut}>
             <Button type="submit" variant="ghost" size="sm">
               Sign out
