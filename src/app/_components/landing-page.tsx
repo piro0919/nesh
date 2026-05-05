@@ -100,7 +100,7 @@ export function Subscribe() {
             <div className="flex flex-col gap-6 text-sm">
               <Faq
                 q="Is it free?"
-                a="Yes, free during the early phase. Long-term pricing isn't decided yet — Nesh is a side project run by one developer, not a VC-backed startup."
+                a="Yes, free during early access — within these caps: 1 project, 5,000 subscribers per project, 10,000 sends per month. Long-term pricing isn't decided yet (Nesh is a side project run by one developer, not a VC-backed startup)."
               />
               <Faq
                 q="Why not just use OneSignal?"
