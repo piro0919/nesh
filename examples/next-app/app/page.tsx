@@ -18,8 +18,8 @@ export default function Page() {
         <h1>Setup needed</h1>
         <p>
           Copy <code>.env.example</code> to <code>.env.local</code> and fill in
-          <code>NEXT_PUBLIC_NESH_API_BASE</code> and{" "}
-          <code>NEXT_PUBLIC_NESH_VAPID_PUBLIC_KEY</code> from your Nesh project's "SDK setup" card.
+          <code>NEXT_PUBLIC_NESH_API_BASE</code> and <code>NEXT_PUBLIC_NESH_VAPID_PUBLIC_KEY</code>{" "}
+          from your Nesh project's "SDK setup" card.
         </p>
       </Card>
     );
