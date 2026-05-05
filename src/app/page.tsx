@@ -1,9 +1,8 @@
-import { Button } from "@/components/ui/button";
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
 
-export default function Page() {
-  return (
-    <main className="flex min-h-screen items-center justify-center p-8">
-      <Button>Nesh</Button>
-    </main>
-  );
+export default async function Page() {
+  const supabase = await createClient();
+  const { data } = await supabase.auth.getUser();
+  redirect(data.user ? "/projects" : "/sign-in");
 }

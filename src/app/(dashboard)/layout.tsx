@@ -1,0 +1,26 @@
+import Link from "next/link";
+import { signOut } from "@/app/(auth)/_actions";
+import { Button } from "@/components/ui/button";
+import { getCurrentUser } from "@/lib/auth";
+
+export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const user = await getCurrentUser();
+  return (
+    <div className="flex min-h-screen flex-col">
+      <header className="flex items-center justify-between border-b px-6 py-3">
+        <Link href="/projects" className="font-semibold">
+          Nesh
+        </Link>
+        <div className="flex items-center gap-3 text-sm">
+          <span className="text-muted-foreground">{user.email}</span>
+          <form action={signOut}>
+            <Button type="submit" variant="ghost" size="sm">
+              Sign out
+            </Button>
+          </form>
+        </div>
+      </header>
+      <main className="flex-1 p-6">{children}</main>
+    </div>
+  );
+}
