@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -311,7 +312,9 @@ function WebhookItem({
         >
           {showDeliveries ? "Hide deliveries" : `Recent deliveries (${deliveries.length})`}
         </Button>
-        {showDeliveries ? <DeliveriesList deliveries={deliveries} /> : null}
+        {showDeliveries ? (
+          <DeliveriesList deliveries={deliveries} projectId={projectId} webhookId={webhook.id} />
+        ) : null}
       </div>
     </div>
   );
@@ -336,7 +339,15 @@ function DeliveryStatusLine({ webhook }: { webhook: WebhookRow }) {
   );
 }
 
-function DeliveriesList({ deliveries }: { deliveries: DeliveryRow[] }) {
+function DeliveriesList({
+  deliveries,
+  projectId,
+  webhookId,
+}: {
+  deliveries: DeliveryRow[];
+  projectId: string;
+  webhookId: string;
+}) {
   if (deliveries.length === 0) {
     return <p className="mt-2 text-xs text-muted-foreground">No deliveries logged yet.</p>;
   }
@@ -347,23 +358,27 @@ function DeliveriesList({ deliveries }: { deliveries: DeliveryRow[] }) {
         const retrying = d.next_attempt_at !== null;
         const tone = ok ? "text-green-600" : retrying ? "text-amber-600" : "text-destructive";
         return (
-          <li
-            key={d.id}
-            className="flex items-center justify-between gap-3 border-b py-1 last:border-b-0"
-          >
-            <span className="text-muted-foreground">{new Date(d.created_at).toLocaleString()}</span>
-            <span className="text-muted-foreground">
-              {d.event_type}
-              {d.attempts > 1 ? ` · attempt ${d.attempts}` : ""}
-            </span>
-            <span className={tone}>
-              {d.status_code ?? "net err"}
-              {retrying && d.next_attempt_at
-                ? ` · retry at ${new Date(d.next_attempt_at).toLocaleTimeString()}`
-                : d.error
-                  ? ` · ${d.error}`
-                  : ""}
-            </span>
+          <li key={d.id} className="border-b py-1 last:border-b-0">
+            <Link
+              href={`/projects/${projectId}/webhooks/${webhookId}/deliveries/${d.id}`}
+              className="flex items-center justify-between gap-3 rounded px-1 hover:bg-muted/50"
+            >
+              <span className="text-muted-foreground">
+                {new Date(d.created_at).toLocaleString()}
+              </span>
+              <span className="text-muted-foreground">
+                {d.event_type}
+                {d.attempts > 1 ? ` · attempt ${d.attempts}` : ""}
+              </span>
+              <span className={tone}>
+                {d.status_code ?? "net err"}
+                {retrying && d.next_attempt_at
+                  ? ` · retry at ${new Date(d.next_attempt_at).toLocaleTimeString()}`
+                  : d.error
+                    ? ` · ${d.error}`
+                    : ""}
+              </span>
+            </Link>
           </li>
         );
       })}
