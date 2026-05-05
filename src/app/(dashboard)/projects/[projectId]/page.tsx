@@ -1,8 +1,11 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getSiteUrl } from "@/lib/site-url";
 import { createClient } from "@/lib/supabase/server";
 import { DeleteProjectButton } from "./_components/delete-button";
+import { NotificationsList } from "./_components/notifications-list";
 import { SdkSetup } from "./_components/sdk-setup";
 
 type Props = { params: Promise<{ projectId: string }> };
@@ -31,7 +34,12 @@ export default async function Page({ params }: Props) {
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">{project.name}</h1>
-        <DeleteProjectButton projectId={project.id} projectName={project.name} />
+        <div className="flex items-center gap-2">
+          <Button asChild>
+            <Link href={`/projects/${project.id}/notifications/new`}>Send notification</Link>
+          </Button>
+          <DeleteProjectButton projectId={project.id} projectName={project.name} />
+        </div>
       </div>
       <Card>
         <CardHeader>
@@ -45,9 +53,7 @@ export default async function Page({ params }: Props) {
         </CardContent>
       </Card>
       <SdkSetup apiBase={apiBase} publicKey={project.vapid_public_key} />
-      <p className="text-sm text-muted-foreground">
-        Notification creation and history will appear here in the next phase.
-      </p>
+      <NotificationsList projectId={project.id} />
     </div>
   );
 }
