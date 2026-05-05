@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FREE_TIER, startOfCurrentMonthUtc } from "@/lib/limits";
 import { getSiteUrl } from "@/lib/site-url";
 import { createClient } from "@/lib/supabase/server";
+import { ApiKeyCard } from "./_components/api-key-card";
 import { DeleteProjectButton } from "./_components/delete-button";
 import { NotificationsList } from "./_components/notifications-list";
 import { SdkSetup } from "./_components/sdk-setup";
@@ -17,7 +18,7 @@ export default async function Page({ params }: Props) {
 
   const { data: project, error } = await supabase
     .from("projects")
-    .select("id, name, vapid_public_key, vapid_subject, created_at")
+    .select("id, name, vapid_public_key, vapid_subject, api_key, created_at")
     .eq("id", projectId)
     .maybeSingle();
 
@@ -69,6 +70,7 @@ export default async function Page({ params }: Props) {
         </CardContent>
       </Card>
       <SdkSetup apiBase={apiBase} publicKey={project.vapid_public_key} />
+      <ApiKeyCard projectId={project.id} apiKey={project.api_key} apiBase={apiBase} />
       <NotificationsList projectId={project.id} />
     </div>
   );

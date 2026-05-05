@@ -1,11 +1,16 @@
 "use server";
 
+import { randomBytes } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { encryptString } from "@/lib/crypto";
 import { FREE_TIER } from "@/lib/limits";
 import { createClient } from "@/lib/supabase/server";
 import { generateVapidKeys } from "@/lib/vapid";
+
+function generateApiKey(): string {
+  return `nesh_sk_${randomBytes(24).toString("base64url")}`;
+}
 
 export type CreateProjectState = { error: string } | undefined;
 
@@ -42,6 +47,7 @@ export async function createProject(
       vapid_public_key: publicKey,
       vapid_private_key: encryptedPrivateKey,
       vapid_subject: `mailto:${userData.user.email ?? "noreply@nesh.local"}`,
+      api_key: generateApiKey(),
     })
     .select("id")
     .single();
@@ -58,4 +64,14 @@ export async function deleteProject(projectId: string) {
   if (error) throw error;
   revalidatePath("/projects");
   redirect("/projects");
+}
+
+export async function regenerateApiKey(projectId: string) {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("projects")
+    .update({ api_key: generateApiKey() })
+    .eq("id", projectId);
+  if (error) throw error;
+  revalidatePath(`/projects/${projectId}`);
 }
