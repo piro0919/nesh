@@ -6,11 +6,24 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { type CreateNotificationState, createNotification } from "../_actions";
 
-type Props = { params: Promise<{ projectId: string }> };
+type Props = {
+  params: Promise<{ projectId: string }>;
+  searchParams: Promise<{
+    title?: string;
+    body?: string;
+    url?: string;
+    icon?: string;
+    image?: string;
+    badge?: string;
+    target_user_ids?: string;
+  }>;
+};
 
-export default function Page({ params }: Props) {
+export default function Page({ params, searchParams }: Props) {
   const { projectId } = use(params);
+  const initial = use(searchParams);
   const [mode, setMode] = useState<"immediate" | "scheduled">("immediate");
+  const hasVisuals = Boolean(initial.icon || initial.image || initial.badge);
 
   const action = createNotification.bind(null, projectId);
   const [state, formAction, pending] = useActionState<CreateNotificationState, FormData>(
@@ -24,7 +37,14 @@ export default function Page({ params }: Props) {
 
       <div className="flex flex-col gap-2">
         <Label htmlFor="title">Title</Label>
-        <Input id="title" name="title" required maxLength={200} autoFocus />
+        <Input
+          id="title"
+          name="title"
+          required
+          maxLength={200}
+          autoFocus
+          defaultValue={initial.title ?? ""}
+        />
       </div>
 
       <div className="flex flex-col gap-2">
@@ -36,15 +56,22 @@ export default function Page({ params }: Props) {
           maxLength={1000}
           rows={4}
           className="rounded border px-3 py-2 text-sm"
+          defaultValue={initial.body ?? ""}
         />
       </div>
 
       <div className="flex flex-col gap-2">
         <Label htmlFor="url">URL (optional)</Label>
-        <Input id="url" name="url" type="url" placeholder="https://example.com" />
+        <Input
+          id="url"
+          name="url"
+          type="url"
+          placeholder="https://example.com"
+          defaultValue={initial.url ?? ""}
+        />
       </div>
 
-      <details className="rounded border px-3 py-2 text-sm">
+      <details className="rounded border px-3 py-2 text-sm" open={hasVisuals}>
         <summary className="cursor-pointer select-none font-medium">Visuals (optional)</summary>
         <div className="mt-3 flex flex-col gap-3">
           <div className="flex flex-col gap-1">
@@ -54,6 +81,7 @@ export default function Page({ params }: Props) {
               name="icon"
               type="url"
               placeholder="https://example.com/icon-192.png"
+              defaultValue={initial.icon ?? ""}
             />
             <p className="text-xs text-muted-foreground">
               Small icon shown alongside the notification (192×192 PNG recommended).
@@ -61,7 +89,13 @@ export default function Page({ params }: Props) {
           </div>
           <div className="flex flex-col gap-1">
             <Label htmlFor="image">Image URL</Label>
-            <Input id="image" name="image" type="url" placeholder="https://example.com/hero.jpg" />
+            <Input
+              id="image"
+              name="image"
+              type="url"
+              placeholder="https://example.com/hero.jpg"
+              defaultValue={initial.image ?? ""}
+            />
             <p className="text-xs text-muted-foreground">
               Large image rendered in the body (Android &amp; some desktop browsers).
             </p>
@@ -73,6 +107,7 @@ export default function Page({ params }: Props) {
               name="badge"
               type="url"
               placeholder="https://example.com/badge-72.png"
+              defaultValue={initial.badge ?? ""}
             />
             <p className="text-xs text-muted-foreground">
               Monochrome icon shown in the system tray (Android only).
@@ -113,6 +148,7 @@ export default function Page({ params }: Props) {
           rows={3}
           placeholder="Leave empty to broadcast. Otherwise comma- or newline-separated."
           className="rounded border px-3 py-2 text-sm"
+          defaultValue={initial.target_user_ids ?? ""}
         />
         <p className="text-xs text-muted-foreground">
           Matches subscriptions whose <code>userId</code> (set via the SDK) is in this list. Empty =

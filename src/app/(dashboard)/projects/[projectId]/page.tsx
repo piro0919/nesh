@@ -10,6 +10,7 @@ import { ApiKeyCard } from "./_components/api-key-card";
 import { DefaultsCard } from "./_components/defaults-card";
 import { DeleteProjectButton } from "./_components/delete-button";
 import { NotificationsList } from "./_components/notifications-list";
+import { ProjectName } from "./_components/project-name";
 import { SdkSetup } from "./_components/sdk-setup";
 
 type Props = { params: Promise<{ projectId: string }> };
@@ -47,7 +48,7 @@ export default async function Page({ params }: Props) {
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">{project.name}</h1>
+        <ProjectName projectId={project.id} name={project.name} />
         <div className="flex items-center gap-2">
           <Button asChild>
             <Link href={`/projects/${project.id}/notifications/new`}>Send notification</Link>
