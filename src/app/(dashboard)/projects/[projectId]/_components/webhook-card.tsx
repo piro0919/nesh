@@ -33,6 +33,8 @@ export type DeliveryRow = {
   status_code: number | null;
   error: string | null;
   created_at: string;
+  attempts: number;
+  next_attempt_at: string | null;
 };
 
 type Props = {
@@ -305,16 +307,25 @@ function DeliveriesList({ deliveries }: { deliveries: DeliveryRow[] }) {
     <ul className="mt-2 flex flex-col gap-1 text-xs">
       {deliveries.map((d) => {
         const ok = d.status_code && d.status_code >= 200 && d.status_code < 300;
+        const retrying = d.next_attempt_at !== null;
+        const tone = ok ? "text-green-600" : retrying ? "text-amber-600" : "text-destructive";
         return (
           <li
             key={d.id}
             className="flex items-center justify-between gap-3 border-b py-1 last:border-b-0"
           >
             <span className="text-muted-foreground">{new Date(d.created_at).toLocaleString()}</span>
-            <span className="text-muted-foreground">{d.event_type}</span>
-            <span className={ok ? "text-green-600" : "text-destructive"}>
+            <span className="text-muted-foreground">
+              {d.event_type}
+              {d.attempts > 1 ? ` · attempt ${d.attempts}` : ""}
+            </span>
+            <span className={tone}>
               {d.status_code ?? "net err"}
-              {d.error ? ` · ${d.error}` : ""}
+              {retrying && d.next_attempt_at
+                ? ` · retry at ${new Date(d.next_attempt_at).toLocaleTimeString()}`
+                : d.error
+                  ? ` · ${d.error}`
+                  : ""}
             </span>
           </li>
         );
