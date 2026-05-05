@@ -36,12 +36,15 @@ export type Database = {
     Tables: {
       notifications: {
         Row: {
+          badge: string | null
           body: string
           clicked: number
           created_at: string
           delivered: number
           failed: number
+          icon: string | null
           id: string
+          image: string | null
           project_id: string
           removed: number
           scheduled_at: string | null
@@ -52,12 +55,15 @@ export type Database = {
           url: string | null
         }
         Insert: {
+          badge?: string | null
           body: string
           clicked?: number
           created_at?: string
           delivered?: number
           failed?: number
+          icon?: string | null
           id?: string
+          image?: string | null
           project_id: string
           removed?: number
           scheduled_at?: string | null
@@ -68,12 +74,15 @@ export type Database = {
           url?: string | null
         }
         Update: {
+          badge?: string | null
           body?: string
           clicked?: number
           created_at?: string
           delivered?: number
           failed?: number
+          icon?: string | null
           id?: string
+          image?: string | null
           project_id?: string
           removed?: number
           scheduled_at?: string | null
@@ -97,6 +106,8 @@ export type Database = {
         Row: {
           api_key: string
           created_at: string
+          default_badge: string | null
+          default_icon: string | null
           id: string
           name: string
           user_id: string
@@ -107,6 +118,8 @@ export type Database = {
         Insert: {
           api_key: string
           created_at?: string
+          default_badge?: string | null
+          default_icon?: string | null
           id?: string
           name: string
           user_id: string
@@ -117,6 +130,8 @@ export type Database = {
         Update: {
           api_key?: string
           created_at?: string
+          default_badge?: string | null
+          default_icon?: string | null
           id?: string
           name?: string
           user_id?: string

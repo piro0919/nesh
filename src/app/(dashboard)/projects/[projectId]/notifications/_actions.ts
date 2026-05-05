@@ -17,6 +17,9 @@ export async function createNotification(
   const title = String(formData.get("title") ?? "").trim();
   const body = String(formData.get("body") ?? "").trim();
   const urlRaw = String(formData.get("url") ?? "").trim();
+  const iconRaw = String(formData.get("icon") ?? "").trim();
+  const imageRaw = String(formData.get("image") ?? "").trim();
+  const badgeRaw = String(formData.get("badge") ?? "").trim();
   const scheduledAtRaw = String(formData.get("scheduled_at") ?? "").trim();
   const mode = String(formData.get("mode") ?? "immediate");
   const targetRaw = String(formData.get("target_user_ids") ?? "").trim();
@@ -39,6 +42,9 @@ export async function createNotification(
     title,
     body,
     url: urlRaw === "" ? null : urlRaw,
+    icon: iconRaw === "" ? null : iconRaw,
+    image: imageRaw === "" ? null : imageRaw,
+    badge: badgeRaw === "" ? null : badgeRaw,
   });
   if (!parsed.success) {
     return { error: parsed.error.issues.map((i) => i.message).join(", ") };
@@ -74,6 +80,9 @@ export async function createNotification(
       title: parsed.data.title,
       body: parsed.data.body,
       url: parsed.data.url ?? null,
+      icon: parsed.data.icon ?? null,
+      image: parsed.data.image ?? null,
+      badge: parsed.data.badge ?? null,
       scheduled_at: scheduledAt,
       status: "pending",
       target_user_ids: targetUserIds,

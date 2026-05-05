@@ -44,6 +44,43 @@ export default function Page({ params }: Props) {
         <Input id="url" name="url" type="url" placeholder="https://example.com" />
       </div>
 
+      <details className="rounded border px-3 py-2 text-sm">
+        <summary className="cursor-pointer select-none font-medium">Visuals (optional)</summary>
+        <div className="mt-3 flex flex-col gap-3">
+          <div className="flex flex-col gap-1">
+            <Label htmlFor="icon">Icon URL</Label>
+            <Input
+              id="icon"
+              name="icon"
+              type="url"
+              placeholder="https://example.com/icon-192.png"
+            />
+            <p className="text-xs text-muted-foreground">
+              Small icon shown alongside the notification (192×192 PNG recommended).
+            </p>
+          </div>
+          <div className="flex flex-col gap-1">
+            <Label htmlFor="image">Image URL</Label>
+            <Input id="image" name="image" type="url" placeholder="https://example.com/hero.jpg" />
+            <p className="text-xs text-muted-foreground">
+              Large image rendered in the body (Android &amp; some desktop browsers).
+            </p>
+          </div>
+          <div className="flex flex-col gap-1">
+            <Label htmlFor="badge">Badge URL</Label>
+            <Input
+              id="badge"
+              name="badge"
+              type="url"
+              placeholder="https://example.com/badge-72.png"
+            />
+            <p className="text-xs text-muted-foreground">
+              Monochrome icon shown in the system tray (Android only).
+            </p>
+          </div>
+        </div>
+      </details>
+
       <fieldset className="flex flex-col gap-2">
         <legend className="text-sm font-medium">Send</legend>
         <label className="flex items-center gap-2 text-sm">

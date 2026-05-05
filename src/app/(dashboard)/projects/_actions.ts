@@ -75,3 +75,48 @@ export async function regenerateApiKey(projectId: string) {
   if (error) throw error;
   revalidatePath(`/projects/${projectId}`);
 }
+
+export type UpdateDefaultsState = { error: string } | { ok: true } | undefined;
+
+const MAX_URL_LENGTH = 2048;
+
+function sanitizeUrl(value: string): string | null | { error: string } {
+  const trimmed = value.trim();
+  if (trimmed === "") return null;
+  if (trimmed.length > MAX_URL_LENGTH) return { error: "URL too long" };
+  try {
+    const u = new URL(trimmed);
+    if (u.protocol !== "https:" && u.protocol !== "http:") return { error: "Invalid URL" };
+    return trimmed;
+  } catch {
+    return { error: "Invalid URL" };
+  }
+}
+
+export async function updateProjectDefaults(
+  projectId: string,
+  _prev: UpdateDefaultsState,
+  formData: FormData,
+): Promise<UpdateDefaultsState> {
+  const iconResult = sanitizeUrl(String(formData.get("default_icon") ?? ""));
+  if (typeof iconResult === "object" && iconResult && "error" in iconResult) {
+    return { error: `Icon URL: ${iconResult.error}` };
+  }
+  const badgeResult = sanitizeUrl(String(formData.get("default_badge") ?? ""));
+  if (typeof badgeResult === "object" && badgeResult && "error" in badgeResult) {
+    return { error: `Badge URL: ${badgeResult.error}` };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("projects")
+    .update({
+      default_icon: iconResult as string | null,
+      default_badge: badgeResult as string | null,
+    })
+    .eq("id", projectId);
+  if (error) return { error: error.message };
+
+  revalidatePath(`/projects/${projectId}`);
+  return { ok: true };
+}

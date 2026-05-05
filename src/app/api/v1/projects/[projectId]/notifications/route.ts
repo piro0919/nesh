@@ -88,6 +88,9 @@ export async function POST(request: NextRequest, { params }: Params) {
       title: parsed.data.title,
       body: parsed.data.body,
       url: parsed.data.url ?? null,
+      icon: parsed.data.icon ?? null,
+      image: parsed.data.image ?? null,
+      badge: parsed.data.badge ?? null,
       status: "pending",
       target_user_ids: targetUserIds,
     })
