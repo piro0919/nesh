@@ -1,6 +1,31 @@
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { createClient } from "@/lib/supabase/server";
 import { DeleteNotificationButton } from "./delete-notification-button";
+
+type Notification = {
+  id: string;
+  title: string;
+  body: string;
+  url: string | null;
+  icon: string | null;
+  image: string | null;
+  badge: string | null;
+  target_user_ids: string[] | null;
+};
+
+function resendQuery(projectId: string, n: Notification): string {
+  const params = new URLSearchParams();
+  params.set("title", n.title);
+  params.set("body", n.body);
+  if (n.url) params.set("url", n.url);
+  if (n.icon) params.set("icon", n.icon);
+  if (n.image) params.set("image", n.image);
+  if (n.badge) params.set("badge", n.badge);
+  if (n.target_user_ids?.length) params.set("target_user_ids", n.target_user_ids.join(", "));
+  return `/projects/${projectId}/notifications/new?${params.toString()}`;
+}
 
 type Props = { projectId: string };
 
@@ -9,7 +34,7 @@ export async function NotificationsList({ projectId }: Props) {
   const { data: notifications, error } = await supabase
     .from("notifications")
     .select(
-      "id, title, body, url, scheduled_at, status, created_at, delivered, removed, failed, shown, clicked, target_user_ids",
+      "id, title, body, url, icon, image, badge, scheduled_at, status, created_at, delivered, removed, failed, shown, clicked, target_user_ids",
     )
     .eq("project_id", projectId)
     .order("created_at", { ascending: false })
@@ -60,11 +85,18 @@ export async function NotificationsList({ projectId }: Props) {
                     </span>
                   ) : null}
                 </div>
-                <DeleteNotificationButton
-                  projectId={projectId}
-                  notificationId={n.id}
-                  status={n.status as "pending" | "sent"}
-                />
+                <div className="flex items-center gap-1">
+                  {n.status === "sent" ? (
+                    <Button asChild variant="ghost" size="sm">
+                      <Link href={resendQuery(projectId, n)}>Resend</Link>
+                    </Button>
+                  ) : null}
+                  <DeleteNotificationButton
+                    projectId={projectId}
+                    notificationId={n.id}
+                    status={n.status as "pending" | "sent"}
+                  />
+                </div>
               </li>
             ))}
           </ul>

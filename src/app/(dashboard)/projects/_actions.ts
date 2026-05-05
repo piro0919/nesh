@@ -66,6 +66,26 @@ export async function deleteProject(projectId: string) {
   redirect("/projects");
 }
 
+export type RenameProjectState = { error: string } | { ok: true } | undefined;
+
+export async function renameProject(
+  projectId: string,
+  _prev: RenameProjectState,
+  formData: FormData,
+): Promise<RenameProjectState> {
+  const name = String(formData.get("name") ?? "").trim();
+  if (!name) return { error: "Name is required" };
+  if (name.length > 100) return { error: "Name too long (max 100)" };
+
+  const supabase = await createClient();
+  const { error } = await supabase.from("projects").update({ name }).eq("id", projectId);
+  if (error) return { error: error.message };
+
+  revalidatePath(`/projects/${projectId}`);
+  revalidatePath("/projects");
+  return { ok: true };
+}
+
 export async function regenerateApiKey(projectId: string) {
   const supabase = await createClient();
   const { error } = await supabase
