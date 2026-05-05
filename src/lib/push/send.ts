@@ -17,7 +17,7 @@ export async function sendToProject(
 
   const { data: project, error: projectError } = await supabase
     .from("projects")
-    .select("vapid_public_key, vapid_private_key, vapid_subject")
+    .select("vapid_public_key, vapid_private_key, vapid_subject, default_icon, default_badge")
     .eq("id", projectId)
     .maybeSingle();
   if (projectError) throw projectError;
@@ -25,7 +25,7 @@ export async function sendToProject(
 
   const { data: notification, error: notificationError } = await supabase
     .from("notifications")
-    .select("title, body, url, target_user_ids")
+    .select("title, body, url, icon, image, badge, target_user_ids")
     .eq("id", notificationId)
     .maybeSingle();
   if (notificationError) throw notificationError;
@@ -53,6 +53,9 @@ export async function sendToProject(
     title: notification.title,
     body: notification.body,
     url: notification.url ?? undefined,
+    icon: notification.icon ?? project.default_icon ?? undefined,
+    image: notification.image ?? undefined,
+    badge: notification.badge ?? project.default_badge ?? undefined,
     // _nesh metadata is consumed by next-push >= 0.6 to fire tracking beacons.
     // Older SDK versions ignore unknown keys.
     _nesh: {

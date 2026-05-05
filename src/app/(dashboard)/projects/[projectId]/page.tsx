@@ -7,6 +7,7 @@ import { getSiteUrl } from "@/lib/site-url";
 import { createClient } from "@/lib/supabase/server";
 import { AnalyticsChart } from "./_components/analytics-chart";
 import { ApiKeyCard } from "./_components/api-key-card";
+import { DefaultsCard } from "./_components/defaults-card";
 import { DeleteProjectButton } from "./_components/delete-button";
 import { NotificationsList } from "./_components/notifications-list";
 import { SdkSetup } from "./_components/sdk-setup";
@@ -19,7 +20,9 @@ export default async function Page({ params }: Props) {
 
   const { data: project, error } = await supabase
     .from("projects")
-    .select("id, name, vapid_public_key, vapid_subject, api_key, created_at")
+    .select(
+      "id, name, vapid_public_key, vapid_subject, api_key, created_at, default_icon, default_badge",
+    )
     .eq("id", projectId)
     .maybeSingle();
 
@@ -73,6 +76,11 @@ export default async function Page({ params }: Props) {
       <AnalyticsChart projectId={project.id} />
       <SdkSetup apiBase={apiBase} publicKey={project.vapid_public_key} />
       <ApiKeyCard projectId={project.id} apiKey={project.api_key} apiBase={apiBase} />
+      <DefaultsCard
+        projectId={project.id}
+        defaultIcon={project.default_icon}
+        defaultBadge={project.default_badge}
+      />
       <NotificationsList projectId={project.id} />
     </div>
   );
