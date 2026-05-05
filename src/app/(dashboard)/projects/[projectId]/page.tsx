@@ -63,10 +63,23 @@ export default async function Page({ params }: Props) {
           <Row label="ID" value={project.id} mono />
           <Row label="Created" value={new Date(project.created_at).toLocaleString()} />
           <Row label="VAPID subject" value={project.vapid_subject} mono />
-          <Row
-            label="Subscribers"
-            value={`${subs.toLocaleString()} / ${FREE_TIER.SUBSCRIBERS_PER_PROJECT.toLocaleString()}`}
-          />
+          <div>
+            <span className="text-muted-foreground">Subscribers: </span>
+            <span>
+              {subs.toLocaleString()} / {FREE_TIER.SUBSCRIBERS_PER_PROJECT.toLocaleString()}
+            </span>
+            {subs > 0 ? (
+              <>
+                {" · "}
+                <Link
+                  href={`/projects/${project.id}/subscribers`}
+                  className="underline-offset-2 hover:underline"
+                >
+                  Manage
+                </Link>
+              </>
+            ) : null}
+          </div>
           <Row
             label="Sends this month (UTC)"
             value={`${sends.toLocaleString()} / ${FREE_TIER.NOTIFICATIONS_PER_MONTH.toLocaleString()}`}
