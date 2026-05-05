@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { FREE_TIER, startOfCurrentMonthUtc } from "@/lib/limits";
 import { getSiteUrl } from "@/lib/site-url";
 import { createClient } from "@/lib/supabase/server";
 import { DeleteProjectButton } from "./_components/delete-button";
@@ -28,7 +29,15 @@ export default async function Page({ params }: Props) {
     .select("*", { head: true, count: "exact" })
     .eq("project_id", project.id);
 
+  const { count: monthlySendCount } = await supabase
+    .from("notifications")
+    .select("*", { head: true, count: "exact" })
+    .eq("project_id", project.id)
+    .gte("created_at", startOfCurrentMonthUtc().toISOString());
+
   const apiBase = `${getSiteUrl()}/api/v1/projects/${project.id}`;
+  const subs = subscriberCount ?? 0;
+  const sends = monthlySendCount ?? 0;
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
@@ -49,7 +58,14 @@ export default async function Page({ params }: Props) {
           <Row label="ID" value={project.id} mono />
           <Row label="Created" value={new Date(project.created_at).toLocaleString()} />
           <Row label="VAPID subject" value={project.vapid_subject} mono />
-          <Row label="Subscribers" value={String(subscriberCount ?? 0)} />
+          <Row
+            label="Subscribers"
+            value={`${subs.toLocaleString()} / ${FREE_TIER.SUBSCRIBERS_PER_PROJECT.toLocaleString()}`}
+          />
+          <Row
+            label="Sends this month (UTC)"
+            value={`${sends.toLocaleString()} / ${FREE_TIER.NOTIFICATIONS_PER_MONTH.toLocaleString()}`}
+          />
         </CardContent>
       </Card>
       <SdkSetup apiBase={apiBase} publicKey={project.vapid_public_key} />

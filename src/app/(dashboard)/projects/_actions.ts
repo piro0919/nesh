@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { encryptString } from "@/lib/crypto";
+import { FREE_TIER } from "@/lib/limits";
 import { createClient } from "@/lib/supabase/server";
 import { generateVapidKeys } from "@/lib/vapid";
 
@@ -18,6 +19,17 @@ export async function createProject(
   const supabase = await createClient();
   const { data: userData, error: userError } = await supabase.auth.getUser();
   if (userError || !userData.user) return { error: "Not authenticated" };
+
+  const { count: existingCount, error: countError } = await supabase
+    .from("projects")
+    .select("*", { head: true, count: "exact" })
+    .eq("user_id", userData.user.id);
+  if (countError) return { error: countError.message };
+  if ((existingCount ?? 0) >= FREE_TIER.PROJECTS_PER_USER) {
+    return {
+      error: `Free tier allows ${FREE_TIER.PROJECTS_PER_USER} project per account. Delete the existing one to create a new project.`,
+    };
+  }
 
   const { publicKey, privateKey } = generateVapidKeys();
   const encryptedPrivateKey = await encryptString(privateKey);

@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { FREE_TIER, startOfCurrentMonthUtc } from "@/lib/limits";
 import { notificationPayloadSchema } from "@/lib/push/payload";
 import { sendToProject } from "@/lib/push/send";
 import { createClient } from "@/lib/supabase/server";
@@ -38,6 +39,19 @@ export async function createNotification(
   }
 
   const supabase = await createClient();
+
+  const { count: monthCount, error: countError } = await supabase
+    .from("notifications")
+    .select("*", { head: true, count: "exact" })
+    .eq("project_id", projectId)
+    .gte("created_at", startOfCurrentMonthUtc().toISOString());
+  if (countError) return { error: countError.message };
+  if ((monthCount ?? 0) >= FREE_TIER.NOTIFICATIONS_PER_MONTH) {
+    return {
+      error: `Monthly send limit reached (${FREE_TIER.NOTIFICATIONS_PER_MONTH.toLocaleString()} notifications). Resets at the start of next month (UTC).`,
+    };
+  }
+
   const { data: notification, error } = await supabase
     .from("notifications")
     .insert({

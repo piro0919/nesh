@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getClientIp } from "@/lib/get-client-ip";
+import { FREE_TIER } from "@/lib/limits";
 import { checkRateLimit, type RateLimitResult } from "@/lib/rate-limit";
 import { subscriptionSchema } from "@/lib/subscription-schema";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -82,6 +83,29 @@ export async function POST(request: NextRequest, { params }: Params) {
   if (!project) return jsonResponse({ error: "Project not found" }, 404);
 
   const { endpoint, keys } = parsed.data;
+
+  // Enforce subscriber cap, but only for NEW endpoints (re-subscribes update existing rows)
+  const { data: existing } = await supabase
+    .from("subscriptions")
+    .select("id")
+    .eq("project_id", projectId)
+    .eq("endpoint", endpoint)
+    .maybeSingle();
+
+  if (!existing) {
+    const { count } = await supabase
+      .from("subscriptions")
+      .select("*", { head: true, count: "exact" })
+      .eq("project_id", projectId);
+    if ((count ?? 0) >= FREE_TIER.SUBSCRIBERS_PER_PROJECT) {
+      return jsonResponse(
+        {
+          error: `Subscriber cap reached (${FREE_TIER.SUBSCRIBERS_PER_PROJECT.toLocaleString()})`,
+        },
+        403,
+      );
+    }
+  }
 
   const { error: upsertError } = await supabase.from("subscriptions").upsert(
     {
