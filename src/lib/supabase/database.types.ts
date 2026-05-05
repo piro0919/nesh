@@ -37,6 +37,7 @@ export type Database = {
       notifications: {
         Row: {
           body: string
+          clicked: number
           created_at: string
           delivered: number
           failed: number
@@ -44,6 +45,7 @@ export type Database = {
           project_id: string
           removed: number
           scheduled_at: string | null
+          shown: number
           status: string
           target_user_ids: string[] | null
           title: string
@@ -51,6 +53,7 @@ export type Database = {
         }
         Insert: {
           body: string
+          clicked?: number
           created_at?: string
           delivered?: number
           failed?: number
@@ -58,6 +61,7 @@ export type Database = {
           project_id: string
           removed?: number
           scheduled_at?: string | null
+          shown?: number
           status?: string
           target_user_ids?: string[] | null
           title: string
@@ -65,6 +69,7 @@ export type Database = {
         }
         Update: {
           body?: string
+          clicked?: number
           created_at?: string
           delivered?: number
           failed?: number
@@ -72,6 +77,7 @@ export type Database = {
           project_id?: string
           removed?: number
           scheduled_at?: string | null
+          shown?: number
           status?: string
           target_user_ids?: string[] | null
           title?: string
@@ -181,6 +187,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      increment_notification_event: {
+        Args: {
+          p_column: string
+          p_notification_id: string
+          p_project_id: string
+        }
+        Returns: undefined
+      }
       increment_rate_limit: {
         Args: { p_key: string; p_window_start: string }
         Returns: number

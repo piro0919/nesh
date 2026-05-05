@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FREE_TIER, startOfCurrentMonthUtc } from "@/lib/limits";
 import { getSiteUrl } from "@/lib/site-url";
 import { createClient } from "@/lib/supabase/server";
+import { AnalyticsChart } from "./_components/analytics-chart";
 import { ApiKeyCard } from "./_components/api-key-card";
 import { DeleteProjectButton } from "./_components/delete-button";
 import { NotificationsList } from "./_components/notifications-list";
@@ -69,6 +70,7 @@ export default async function Page({ params }: Props) {
           />
         </CardContent>
       </Card>
+      <AnalyticsChart projectId={project.id} />
       <SdkSetup apiBase={apiBase} publicKey={project.vapid_public_key} />
       <ApiKeyCard projectId={project.id} apiKey={project.api_key} apiBase={apiBase} />
       <NotificationsList projectId={project.id} />

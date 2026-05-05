@@ -47,10 +47,20 @@ export async function sendToProject(
 
   webpush.setVapidDetails(project.vapid_subject, project.vapid_public_key, privateKey);
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://nesh.kkweb.io";
+  const eventBase = `${siteUrl}/api/v1/projects/${projectId}/notifications/${notificationId}/events`;
   const payload = JSON.stringify({
     title: notification.title,
     body: notification.body,
     url: notification.url ?? undefined,
+    // _nesh metadata is consumed by next-push >= 0.6 to fire tracking beacons.
+    // Older SDK versions ignore unknown keys.
+    _nesh: {
+      track: {
+        shown: eventBase,
+        click: eventBase,
+      },
+    },
   });
 
   let sent = 0;
