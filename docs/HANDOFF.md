@@ -41,7 +41,17 @@
   - 環境変数 5 つ登録済 (URL / ANON / SERVICE_ROLE / SITE_URL=`https://nesh.kkweb.io` / CRON_SECRET)
   - Cron 毎分動作中(`vercel.ts` で `/api/cron/dispatch`)
   - ヘルスチェック合格: `/` 307→/sign-in、`/sign-in` `/sign-up` 200、cron unauth 401 / auth 200、API OPTIONS 204
-- 未着手：next-push 0.4 リリース ([PR #22](https://github.com/piro0919/next-push/pull/22) マージ後 `npm publish`)、ブラウザ実機での push 受信確認
+- **next-push 0.4.0 npm 公開済**: [npmjs.com/package/@piro0919/next-push](https://www.npmjs.com/package/@piro0919/next-push)。`apiBase` オプション対応
+- **Phase 2 着手済**:
+  - **P1 LP** ✅ 未認証 `/` で hero / why / how / faq / footer + OG/Twitter card
+  - **P2 Rate limit** ✅ `/api/v1/projects/<id>` POST/DELETE に IP×project×action 単位で 60/min。429 時は Retry-After + X-RateLimit-* ヘッダ。Cron で 24h より古い rate_limits 行を sweep
+  - **P3 VAPID 暗号化** ✅ AES-256-GCM (32-byte key) で `projects.vapid_private_key` を暗号化保存。`src/lib/crypto.ts` の encryptString/decryptString。本番 env `VAPID_KEY_ENCRYPTION_KEY` 設定済
+  - **P4 Analytics: delivered** ✅ `notifications.{delivered, removed, failed}` 列を追加、send 後に書き込み、履歴 UI で `<n> delivered · <m> removed · <k> failed` 表示
+  - **P7 OG image** ✅ `/opengraph-image` の動的 PNG (1200×630)
+- 未着手:
+  - **P5 external_user_id** — SDK (next-push) 側に option 追加が先決。Nesh 側は `subscriptions.external_user_id` 列追加 + 送信 UI のターゲット指定追加で対応予定
+  - **P6 REST API 送信** — `POST /api/v1/projects/<id>/notifications` で API key 認証 → 即時送信。`projects.api_key` 列 + ダッシュボード表示が必要
+  - ブラウザ実機での push 受信 E2E
 
 ## ブランド
 
