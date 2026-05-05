@@ -34,6 +34,44 @@ export type Database = {
   }
   public: {
     Tables: {
+      error_logs: {
+        Row: {
+          context: string
+          created_at: string
+          id: string
+          message: string
+          metadata: Json | null
+          project_id: string | null
+          stack: string | null
+        }
+        Insert: {
+          context: string
+          created_at?: string
+          id?: string
+          message: string
+          metadata?: Json | null
+          project_id?: string | null
+          stack?: string | null
+        }
+        Update: {
+          context?: string
+          created_at?: string
+          id?: string
+          message?: string
+          metadata?: Json | null
+          project_id?: string | null
+          stack?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "error_logs_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           badge: string | null

@@ -1,5 +1,6 @@
 import webpush from "web-push";
 import { decryptString, isEncrypted } from "@/lib/crypto";
+import { logError } from "@/lib/error-log";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { fireSubscriptionRemoved } from "@/lib/webhooks";
 
@@ -90,7 +91,10 @@ export async function sendToProject(
         removed++;
       } else {
         failed++;
-        console.error("[push] send failed", { subscriptionId: sub.id, error });
+        await logError("push.send", error, {
+          projectId,
+          metadata: { subscriptionId: sub.id, notificationId },
+        });
       }
     }
   }

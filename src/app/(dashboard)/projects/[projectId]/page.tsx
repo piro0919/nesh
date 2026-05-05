@@ -85,6 +85,13 @@ export default async function Page({ params }: Props) {
     deliveriesByWebhook[k] = deliveriesByWebhook[k].slice(0, 20);
   }
 
+  const { data: errors } = await supabase
+    .from("error_logs")
+    .select("id, context, message, created_at")
+    .eq("project_id", project.id)
+    .order("created_at", { ascending: false })
+    .limit(10);
+
   const apiBase = `${getSiteUrl()}/api/v1/projects/${project.id}`;
   const subs = subscriberCount ?? 0;
   const sends = monthlySendCount ?? 0;
@@ -145,8 +152,42 @@ export default async function Page({ params }: Props) {
         deliveriesByWebhook={deliveriesByWebhook}
       />
       <ExportCard projectId={project.id} />
+      <ErrorsCard errors={errors ?? []} />
       <NotificationsList projectId={project.id} />
     </div>
+  );
+}
+
+function ErrorsCard({
+  errors,
+}: {
+  errors: Array<{ id: string; context: string; message: string; created_at: string }>;
+}) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Recent errors</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {errors.length === 0 ? (
+          <p className="text-sm text-muted-foreground">No errors logged.</p>
+        ) : (
+          <ul className="flex flex-col gap-1 text-xs">
+            {errors.map((e) => (
+              <li key={e.id} className="flex items-baseline gap-3 border-b py-1 last:border-b-0">
+                <span className="text-muted-foreground">
+                  {new Date(e.created_at).toLocaleString()}
+                </span>
+                <code className="text-xs">{e.context}</code>
+                <span className="truncate text-destructive" title={e.message}>
+                  {e.message}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </CardContent>
+    </Card>
   );
 }
 

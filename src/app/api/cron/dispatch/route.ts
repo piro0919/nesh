@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { logError } from "@/lib/error-log";
 import { sendToProject } from "@/lib/push/send";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { fireSentWebhook, retryDueWebhooks } from "@/lib/webhooks";
@@ -63,7 +64,7 @@ export async function POST(request: NextRequest) {
     const r = await retryDueWebhooks();
     webhooksRetried = r.retried;
   } catch (retryError) {
-    console.error("[cron] webhook retries failed", retryError);
+    await logError("cron.webhook_retry", retryError);
   }
 
   // Cleanup rate_limits older than 24h (best-effort; failure does not block dispatch)
@@ -71,7 +72,7 @@ export async function POST(request: NextRequest) {
     const cutoff = new Date(Date.now() - 24 * 3600 * 1000).toISOString();
     await supabase.from("rate_limits").delete().lt("window_start", cutoff);
   } catch (cleanupError) {
-    console.error("[cron] rate_limits cleanup failed", cleanupError);
+    await logError("cron.rate_limits_cleanup", cleanupError);
   }
 
   return NextResponse.json({ processed: results.length, webhooksRetried, results });
