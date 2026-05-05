@@ -9,7 +9,7 @@ export async function NotificationsList({ projectId }: Props) {
   const { data: notifications, error } = await supabase
     .from("notifications")
     .select(
-      "id, title, body, url, scheduled_at, status, created_at, delivered, removed, failed, target_user_ids",
+      "id, title, body, url, scheduled_at, status, created_at, delivered, removed, failed, shown, clicked, target_user_ids",
     )
     .eq("project_id", projectId)
     .order("created_at", { ascending: false })
@@ -54,7 +54,7 @@ export async function NotificationsList({ projectId }: Props) {
                   ) : null}
                   {n.status === "sent" ? (
                     <span className="text-xs text-muted-foreground">
-                      {n.delivered} delivered
+                      {n.delivered} delivered · {n.shown} shown · {n.clicked} clicked
                       {n.removed > 0 ? ` · ${n.removed} removed` : ""}
                       {n.failed > 0 ? ` · ${n.failed} failed` : ""}
                     </span>
