@@ -9,6 +9,7 @@ import { AnalyticsChart } from "./_components/analytics-chart";
 import { ApiKeyCard } from "./_components/api-key-card";
 import { DefaultsCard } from "./_components/defaults-card";
 import { DeleteProjectButton } from "./_components/delete-button";
+import { ExportCard } from "./_components/export-card";
 import { NotificationsList } from "./_components/notifications-list";
 import { ProjectName } from "./_components/project-name";
 import { SdkSetup } from "./_components/sdk-setup";
@@ -103,6 +104,7 @@ export default async function Page({ params }: Props) {
         defaultBadge={project.default_badge}
       />
       <WebhookCard projectId={project.id} webhook={webhook ?? null} />
+      <ExportCard projectId={project.id} />
       <NotificationsList projectId={project.id} />
     </div>
   );
