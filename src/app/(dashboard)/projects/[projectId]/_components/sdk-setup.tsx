@@ -23,6 +23,13 @@ const { subscribe } = usePush({
         <CardTitle>SDK setup</CardTitle>
       </CardHeader>
       <CardContent className="grid gap-4 text-sm">
+        <p className="text-muted-foreground">
+          Full reference at{" "}
+          <a href="/docs" className="underline-offset-2 hover:underline">
+            /docs
+          </a>
+          .
+        </p>
         <Field label="apiBase" value={apiBase} />
         <Field label="publicKey" value={publicKey} mono />
         <div className="grid gap-2">

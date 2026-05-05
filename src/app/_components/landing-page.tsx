@@ -16,6 +16,9 @@ export function LandingPage() {
           </div>
           <div className="flex items-center gap-2">
             <Button asChild variant="ghost" size="sm">
+              <Link href="/docs">Docs</Link>
+            </Button>
+            <Button asChild variant="ghost" size="sm">
               <Link href="/sign-in">Sign in</Link>
             </Button>
             <Button asChild size="sm">
@@ -150,6 +153,9 @@ export function Subscribe() {
         <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-3 px-6 py-8 text-sm text-muted-foreground sm:flex-row">
           <span>© 2026 Nesh · MIT</span>
           <div className="flex items-center gap-4">
+            <Link href="/docs" className="hover:text-foreground">
+              Docs
+            </Link>
             <Link
               href="https://github.com/piro0919/nesh"
               target="_blank"
