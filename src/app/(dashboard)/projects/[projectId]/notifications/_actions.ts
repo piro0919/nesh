@@ -55,10 +55,15 @@ export async function createNotification(
 
   if (mode === "immediate") {
     try {
-      await sendToProject(projectId, notification.id);
+      const result = await sendToProject(projectId, notification.id);
       const { error: updateError } = await supabase
         .from("notifications")
-        .update({ status: "sent" })
+        .update({
+          status: "sent",
+          delivered: result.sent,
+          removed: result.removed,
+          failed: result.failed,
+        })
         .eq("id", notification.id);
       if (updateError) return { error: updateError.message };
     } catch (sendError) {

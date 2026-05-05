@@ -38,8 +38,11 @@ export type Database = {
         Row: {
           body: string
           created_at: string
+          delivered: number
+          failed: number
           id: string
           project_id: string
+          removed: number
           scheduled_at: string | null
           status: string
           title: string
@@ -48,8 +51,11 @@ export type Database = {
         Insert: {
           body: string
           created_at?: string
+          delivered?: number
+          failed?: number
           id?: string
           project_id: string
+          removed?: number
           scheduled_at?: string | null
           status?: string
           title: string
@@ -58,8 +64,11 @@ export type Database = {
         Update: {
           body?: string
           created_at?: string
+          delivered?: number
+          failed?: number
           id?: string
           project_id?: string
+          removed?: number
           scheduled_at?: string | null
           status?: string
           title?: string
