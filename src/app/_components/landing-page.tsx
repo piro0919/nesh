@@ -74,6 +74,19 @@ export function LandingPage() {
           </div>
         </section>
 
+        <section className="mx-auto max-w-6xl px-6 py-16">
+          <h2 className="mb-8 text-center text-2xl font-semibold">The dashboard</h2>
+          <div className="overflow-hidden rounded-lg border shadow-sm">
+            <Image
+              src="/dashboard-preview.png"
+              alt="Nesh dashboard showing a project with subscriber count, monthly sends, and notification history"
+              width={1600}
+              height={1000}
+              className="h-auto w-full"
+            />
+          </div>
+        </section>
+
         <section className="mx-auto max-w-5xl px-6 py-16">
           <h2 className="mb-8 text-center text-2xl font-semibold">How it works</h2>
           <div className="grid gap-8 md:grid-cols-3">
