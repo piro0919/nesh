@@ -34,10 +34,15 @@ export async function POST(request: NextRequest) {
 
   for (const row of due ?? []) {
     try {
-      await sendToProject(row.project_id, row.id);
+      const sendResult = await sendToProject(row.project_id, row.id);
       const { error: updateError } = await supabase
         .from("notifications")
-        .update({ status: "sent" })
+        .update({
+          status: "sent",
+          delivered: sendResult.sent,
+          removed: sendResult.removed,
+          failed: sendResult.failed,
+        })
         .eq("id", row.id);
       if (updateError) throw updateError;
       results.push({ id: row.id, status: "sent" });

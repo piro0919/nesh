@@ -8,7 +8,7 @@ export async function NotificationsList({ projectId }: Props) {
   const supabase = await createClient();
   const { data: notifications, error } = await supabase
     .from("notifications")
-    .select("id, title, body, url, scheduled_at, status, created_at")
+    .select("id, title, body, url, scheduled_at, status, created_at, delivered, removed, failed")
     .eq("project_id", projectId)
     .order("created_at", { ascending: false })
     .limit(50);
@@ -44,6 +44,13 @@ export async function NotificationsList({ projectId }: Props) {
                       ? `Scheduled for ${new Date(n.scheduled_at).toLocaleString()}`
                       : `Sent ${new Date(n.created_at).toLocaleString()}`}
                   </span>
+                  {n.status === "sent" ? (
+                    <span className="text-xs text-muted-foreground">
+                      {n.delivered} delivered
+                      {n.removed > 0 ? ` · ${n.removed} removed` : ""}
+                      {n.failed > 0 ? ` · ${n.failed} failed` : ""}
+                    </span>
+                  ) : null}
                 </div>
                 <DeleteNotificationButton
                   projectId={projectId}
