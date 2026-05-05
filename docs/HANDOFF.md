@@ -8,13 +8,19 @@
 - ローカル：`/Users/piro/Repository/nesh`
 - Next.js 16 (App Router, TypeScript, Tailwind v4, Turbopack, src ディレクトリ) のスキャフォールド完了
 - 設計書：[`docs/spec/2026-04-27-push-saas-mvp-design.md`](./spec/2026-04-27-push-saas-mvp-design.md) に集約済み
-- 実装プラン Plan 1（基盤）：[`docs/plan/2026-05-05-mvp-foundation.md`](./plan/2026-05-05-mvp-foundation.md) — **完了**（`feat/mvp-foundation` ブランチ）
+- 実装プラン Plan 1（基盤）：[`docs/plan/2026-05-05-mvp-foundation.md`](./plan/2026-05-05-mvp-foundation.md) — **完了**（main にマージ済み）
   - Biome（lint + format）導入済み
   - Supabase ローカルスタック構築済み（`pnpm db:start` で起動）
   - 初期マイグレーション適用済み（`projects` / `subscriptions` / `notifications` + RLS）
   - Supabase 型生成・Server / Browser クライアント・`src/proxy.ts`（Next.js 16 の middleware 後継）整備済み
   - shadcn/ui 初期化 + Button コンポーネント追加済み
-- 未着手：Plan 2 以降（認証、プロジェクト CRUD、購読エンドポイント、通知送信、Cron、履歴 UI）
+- 実装プラン Plan 2（認証 + プロジェクト CRUD）：[`docs/plan/2026-05-05-auth-and-projects.md`](./plan/2026-05-05-auth-and-projects.md) — **完了**（`feat/auth-and-projects` ブランチ）
+  - Supabase Auth (email + password) によるサインアップ / サインイン / サインアウト動作
+  - shadcn/ui 追加: Input / Label / Form / Card / Sonner
+  - プロジェクト CRUD: 一覧 / 作成（VAPID 自動生成）/ 詳細シェル / 削除
+  - Route Group `(auth)` / `(dashboard)` でガード集約、`/` は認証状態に応じて redirect
+  - Programmatic E2E（Supabase REST 経由のサインアップ → insert → select）で RLS が user スコープで効いていることを確認済み
+- 未着手：Plan 3 以降（購読エンドポイント、SDK セットアップ画面、通知送信、Cron、履歴 UI）
 
 ## ブランド
 
@@ -43,11 +49,20 @@
 
 Plan 1 の完了を受けて、残りは以下の順で進める想定（Plan 2 以降のプラン書き起こしから着手）:
 
-1. **Plan 2: 認証 + プロジェクト CRUD** — Supabase Auth フロー、サインアップ/サインイン、プロジェクト一覧・作成・詳細・削除、VAPID 自動生成
-2. **Plan 3: 購読エンドポイント + SDK セットアップ画面** — `@piro0919/next-push/server` の `createPushHandler` 互換エンドポイント、`apiBase` / `publicKey` コピー UI
-3. **Plan 4: 通知送信（即時 + 予約 + Cron）+ 履歴 UI** — 通知作成、即時送信、予約送信、Vercel Cron でのディスパッチ、送信履歴一覧
-4. **Vercel デプロイ + 本番 Supabase 接続** — 環境変数設定、Cron スケジュール登録
-5. **next-push 0.4 リリース** — `usePush` に `apiBase` オプションを追加（別リポジトリ `piro0919/next-push` での作業、Plan 3 の動作確認に必要）
+1. **Plan 3: 購読エンドポイント + SDK セットアップ画面** — `@piro0919/next-push/server` の `createPushHandler` 互換エンドポイント、`apiBase` / `publicKey` コピー UI、購読者数の表示
+2. **Plan 4: 通知送信（即時 + 予約 + Cron）+ 履歴 UI** — 通知作成、即時送信、予約送信、Vercel Cron でのディスパッチ、送信履歴一覧
+3. **Vercel デプロイ + 本番 Supabase 接続** — 環境変数設定、Cron スケジュール登録
+4. **next-push 0.4 リリース** — `usePush` に `apiBase` オプションを追加（別リポジトリ `piro0919/next-push` での作業、Plan 3 の動作確認に必要）
+
+### 手動ブラウザテスト（推奨）
+
+Plan 2 完了時点で以下のフローを `pnpm dev` 起動後にブラウザで一度確認しておくと安心:
+
+1. `/` → `/sign-in` リダイレクト
+2. `/sign-up` でアカウント作成 → `/projects` に遷移
+3. 「New project」で作成 → `/projects/<id>` に遷移
+4. 詳細から削除 → `/projects` に戻り消えている
+5. ヘッダの Sign out → `/sign-in` に戻る
 
 ## 後回し項目（実利用後に検討）
 
