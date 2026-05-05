@@ -86,6 +86,7 @@ export type Database = {
       }
       projects: {
         Row: {
+          api_key: string
           created_at: string
           id: string
           name: string
@@ -95,6 +96,7 @@ export type Database = {
           vapid_subject: string
         }
         Insert: {
+          api_key: string
           created_at?: string
           id?: string
           name: string
@@ -104,6 +106,7 @@ export type Database = {
           vapid_subject: string
         }
         Update: {
+          api_key?: string
           created_at?: string
           id?: string
           name?: string

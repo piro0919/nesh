@@ -51,8 +51,8 @@ export function LandingPage() {
           <div className="mx-auto grid max-w-5xl gap-6 px-6 py-16 md:grid-cols-3">
             <Feature title="Simple" body="No segmentation, no journeys, no A/B. Just send." />
             <Feature
-              title="Fast to start"
-              body="Sign up → drop the SDK → send your first push in under 5 minutes."
+              title="REST API"
+              body="Bearer-auth POST endpoint per project. Send from any backend, CI, or curl."
             />
             <Feature
               title="Open source"
