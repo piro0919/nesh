@@ -11,6 +11,14 @@ export const metadata: Metadata = {
   description:
     "A lightweight Web Push SaaS for Next.js / React projects. The hosted alternative to OneSignal — sign up, drop the SDK in, start sending.",
   metadataBase: new URL("https://nesh.kkweb.io"),
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon-96x96.png", type: "image/png", sizes: "96x96" },
+    ],
+    apple: { url: "/apple-touch-icon.png", sizes: "180x180" },
+  },
   openGraph: {
     title: "Nesh — Web Push, made simple",
     description:
