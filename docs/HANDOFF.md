@@ -34,7 +34,13 @@
   - `vercel.ts` で毎分の Cron 設定 (`@vercel/config`)
   - 詳細ページに履歴リスト、pending は Cancel / sent は Delete
   - E2E: 過去日時 pending → cron で sent、未来日時 pending は拾われない、2 回目以降は idempotent を確認済み
-- 未着手：Vercel デプロイ + 本番環境変数設定、next-push 0.4 リリース、ブラウザ実機での push 受信確認
+- **本番デプロイ完了**：[`https://nesh-red.vercel.app`](https://nesh-red.vercel.app)
+  - Vercel scope: `kkweb`、プロジェクト: `nesh`、GitHub 連携済(自動デプロイ)
+  - Supabase 本番: project ref `dxfohaltbjwgoicpvabc` (Tokyo, Free tier、kk-web 個人組織)
+  - 環境変数 5 つ登録済 (URL / ANON / SERVICE_ROLE / SITE_URL / CRON_SECRET)
+  - Cron 毎分動作中(`vercel.ts` で `/api/cron/dispatch`)
+  - ヘルスチェック合格: `/` 307→/sign-in、`/sign-in` `/sign-up` 200、cron unauth 401 / auth 200、API OPTIONS 204
+- 未着手：next-push 0.4 リリース ([PR #22](https://github.com/piro0919/next-push/pull/22) マージ後 `npm publish`)、ブラウザ実機での push 受信確認
 
 ## ブランド
 
