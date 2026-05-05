@@ -50,6 +50,14 @@ export async function POST(request: NextRequest) {
     }
   }
 
+  // Cleanup rate_limits older than 24h (best-effort; failure does not block dispatch)
+  try {
+    const cutoff = new Date(Date.now() - 24 * 3600 * 1000).toISOString();
+    await supabase.from("rate_limits").delete().lt("window_start", cutoff);
+  } catch (cleanupError) {
+    console.error("[cron] rate_limits cleanup failed", cleanupError);
+  }
+
   return NextResponse.json({ processed: results.length, results });
 }
 

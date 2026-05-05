@@ -1,4 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { getClientIp } from "@/lib/get-client-ip";
+import { checkRateLimit, type RateLimitResult } from "@/lib/rate-limit";
 import { subscriptionSchema } from "@/lib/subscription-schema";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -11,8 +13,39 @@ const corsHeaders = {
   "Access-Control-Max-Age": "86400",
 };
 
+const RATE_LIMIT_PER_MIN = 60;
+
 function jsonResponse(body: unknown, status: number) {
   return NextResponse.json(body, { status, headers: corsHeaders });
+}
+
+function rateLimitResponse(result: RateLimitResult) {
+  const retryAfter = Math.max(1, Math.ceil((result.resetAt.getTime() - Date.now()) / 1000));
+  return new NextResponse(JSON.stringify({ error: "Rate limit exceeded" }), {
+    status: 429,
+    headers: {
+      ...corsHeaders,
+      "Content-Type": "application/json",
+      "Retry-After": String(retryAfter),
+      "X-RateLimit-Limit": String(result.limit),
+      "X-RateLimit-Remaining": "0",
+      "X-RateLimit-Reset": String(Math.floor(result.resetAt.getTime() / 1000)),
+    },
+  });
+}
+
+async function enforceRateLimit(
+  request: NextRequest,
+  projectId: string,
+  action: "post" | "delete",
+) {
+  const ip = getClientIp(request);
+  const result = await checkRateLimit({
+    key: `subscriptions:${projectId}:${ip}:${action}`,
+    limit: RATE_LIMIT_PER_MIN,
+    windowSeconds: 60,
+  });
+  return result.ok ? null : rateLimitResponse(result);
 }
 
 export function OPTIONS() {
@@ -21,6 +54,9 @@ export function OPTIONS() {
 
 export async function POST(request: NextRequest, { params }: Params) {
   const { projectId } = await params;
+
+  const limited = await enforceRateLimit(request, projectId, "post");
+  if (limited) return limited;
 
   let payload: unknown;
   try {
@@ -64,8 +100,11 @@ export async function POST(request: NextRequest, { params }: Params) {
 
 export async function DELETE(request: NextRequest, { params }: Params) {
   const { projectId } = await params;
-  const endpoint = request.nextUrl.searchParams.get("endpoint");
 
+  const limited = await enforceRateLimit(request, projectId, "delete");
+  if (limited) return limited;
+
+  const endpoint = request.nextUrl.searchParams.get("endpoint");
   if (!endpoint) {
     return jsonResponse({ error: "Missing endpoint query param" }, 400);
   }
