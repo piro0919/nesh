@@ -1,4 +1,5 @@
 import webpush from "web-push";
+import { decryptString, isEncrypted } from "@/lib/crypto";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 type SendResult = {
@@ -36,11 +37,11 @@ export async function sendToProject(
     .eq("project_id", projectId);
   if (subsError) throw subsError;
 
-  webpush.setVapidDetails(
-    project.vapid_subject,
-    project.vapid_public_key,
-    project.vapid_private_key,
-  );
+  const privateKey = isEncrypted(project.vapid_private_key)
+    ? await decryptString(project.vapid_private_key)
+    : project.vapid_private_key;
+
+  webpush.setVapidDetails(project.vapid_subject, project.vapid_public_key, privateKey);
 
   const payload = JSON.stringify({
     title: notification.title,
