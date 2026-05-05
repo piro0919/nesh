@@ -4,6 +4,7 @@ import { FREE_TIER } from "@/lib/limits";
 import { checkRateLimit, type RateLimitResult } from "@/lib/rate-limit";
 import { subscriptionSchema } from "@/lib/subscription-schema";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { fireSubscriptionCreated, fireSubscriptionRemoved } from "@/lib/webhooks";
 
 type Params = { params: Promise<{ projectId: string }> };
 
@@ -107,18 +108,32 @@ export async function POST(request: NextRequest, { params }: Params) {
     }
   }
 
-  const { error: upsertError } = await supabase.from("subscriptions").upsert(
-    {
-      project_id: projectId,
-      endpoint,
-      p256dh: keys.p256dh,
-      auth: keys.auth,
-      external_user_id: userId ?? null,
-    },
-    { onConflict: "project_id,endpoint" },
-  );
+  const { data: upserted, error: upsertError } = await supabase
+    .from("subscriptions")
+    .upsert(
+      {
+        project_id: projectId,
+        endpoint,
+        p256dh: keys.p256dh,
+        auth: keys.auth,
+        external_user_id: userId ?? null,
+      },
+      { onConflict: "project_id,endpoint" },
+    )
+    .select("id, created_at, external_user_id")
+    .single();
 
   if (upsertError) return jsonResponse({ error: upsertError.message }, 500);
+
+  // Only fire subscription.created for brand-new endpoints, not re-subscribes.
+  if (!existing && upserted) {
+    await fireSubscriptionCreated(projectId, {
+      id: upserted.id,
+      endpoint,
+      external_user_id: upserted.external_user_id,
+      created_at: upserted.created_at,
+    });
+  }
 
   return jsonResponse({ ok: true }, 201);
 }
@@ -135,12 +150,23 @@ export async function DELETE(request: NextRequest, { params }: Params) {
   }
 
   const supabase = createAdminClient();
-  const { error } = await supabase
+  const { data: removed, error } = await supabase
     .from("subscriptions")
     .delete()
     .eq("project_id", projectId)
-    .eq("endpoint", endpoint);
+    .eq("endpoint", endpoint)
+    .select("external_user_id")
+    .maybeSingle();
 
   if (error) return jsonResponse({ error: error.message }, 500);
+
+  if (removed) {
+    await fireSubscriptionRemoved(
+      projectId,
+      { endpoint, external_user_id: removed.external_user_id },
+      "client",
+    );
+  }
+
   return jsonResponse({ ok: true }, 200);
 }
