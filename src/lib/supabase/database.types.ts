@@ -197,6 +197,50 @@ export type Database = {
           },
         ]
       }
+      webhooks: {
+        Row: {
+          created_at: string
+          enabled: boolean
+          id: string
+          last_delivery_at: string | null
+          last_delivery_error: string | null
+          last_delivery_status: number | null
+          project_id: string
+          secret: string
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          last_delivery_at?: string | null
+          last_delivery_error?: string | null
+          last_delivery_status?: number | null
+          project_id: string
+          secret: string
+          url: string
+        }
+        Update: {
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          last_delivery_at?: string | null
+          last_delivery_error?: string | null
+          last_delivery_status?: number | null
+          project_id?: string
+          secret?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "webhooks_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: true
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

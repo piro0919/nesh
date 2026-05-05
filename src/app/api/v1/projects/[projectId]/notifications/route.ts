@@ -3,6 +3,7 @@ import { FREE_TIER, startOfCurrentMonthUtc } from "@/lib/limits";
 import { notificationPayloadSchema } from "@/lib/push/payload";
 import { sendToProject } from "@/lib/push/send";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { fireSentWebhook } from "@/lib/webhooks";
 
 type Params = { params: Promise<{ projectId: string }> };
 
@@ -110,6 +111,8 @@ export async function POST(request: NextRequest, { params }: Params) {
         failed: result.failed,
       })
       .eq("id", notification.id);
+
+    await fireSentWebhook(projectId, notification.id, result);
 
     return jsonResponse(
       {

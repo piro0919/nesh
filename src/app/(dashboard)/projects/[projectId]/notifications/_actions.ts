@@ -6,6 +6,7 @@ import { FREE_TIER, startOfCurrentMonthUtc } from "@/lib/limits";
 import { notificationPayloadSchema } from "@/lib/push/payload";
 import { sendToProject } from "@/lib/push/send";
 import { createClient } from "@/lib/supabase/server";
+import { fireSentWebhook } from "@/lib/webhooks";
 
 export type CreateNotificationState = { error: string } | undefined;
 
@@ -105,6 +106,7 @@ export async function createNotification(
         })
         .eq("id", notification.id);
       if (updateError) return { error: updateError.message };
+      await fireSentWebhook(projectId, notification.id, result);
     } catch (sendError) {
       return { error: sendError instanceof Error ? sendError.message : "Send failed" };
     }

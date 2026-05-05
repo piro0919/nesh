@@ -12,6 +12,7 @@ import { DeleteProjectButton } from "./_components/delete-button";
 import { NotificationsList } from "./_components/notifications-list";
 import { ProjectName } from "./_components/project-name";
 import { SdkSetup } from "./_components/sdk-setup";
+import { WebhookCard } from "./_components/webhook-card";
 
 type Props = { params: Promise<{ projectId: string }> };
 
@@ -40,6 +41,12 @@ export default async function Page({ params }: Props) {
     .select("*", { head: true, count: "exact" })
     .eq("project_id", project.id)
     .gte("created_at", startOfCurrentMonthUtc().toISOString());
+
+  const { data: webhook } = await supabase
+    .from("webhooks")
+    .select("url, secret, enabled, last_delivery_at, last_delivery_status, last_delivery_error")
+    .eq("project_id", project.id)
+    .maybeSingle();
 
   const apiBase = `${getSiteUrl()}/api/v1/projects/${project.id}`;
   const subs = subscriberCount ?? 0;
@@ -95,6 +102,7 @@ export default async function Page({ params }: Props) {
         defaultIcon={project.default_icon}
         defaultBadge={project.default_badge}
       />
+      <WebhookCard projectId={project.id} webhook={webhook ?? null} />
       <NotificationsList projectId={project.id} />
     </div>
   );
