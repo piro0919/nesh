@@ -21,10 +21,45 @@ export type WebhookRow = {
   url: string;
   secret: string;
   enabled: boolean;
+  events: string[] | null;
   last_delivery_at: string | null;
   last_delivery_status: number | null;
   last_delivery_error: string | null;
 };
+
+const EVENT_TYPES = [
+  { value: "notification.sent", label: "notification.sent" },
+  { value: "subscription.created", label: "subscription.created" },
+  { value: "subscription.removed", label: "subscription.removed" },
+] as const;
+
+function EventFilterCheckboxes({ selected }: { selected: string[] | null }) {
+  return (
+    <fieldset className="flex flex-col gap-1">
+      <legend className="text-xs font-medium">Events</legend>
+      <p className="text-xs text-muted-foreground">
+        Leave all checked to receive every event type.
+      </p>
+      <div className="flex flex-wrap gap-3">
+        {EVENT_TYPES.map((e) => {
+          const checked = selected === null || selected.includes(e.value);
+          return (
+            <label key={e.value} className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                name="events"
+                value={e.value}
+                defaultChecked={checked}
+                className="h-4 w-4"
+              />
+              <code className="text-xs">{e.label}</code>
+            </label>
+          );
+        })}
+      </div>
+    </fieldset>
+  );
+}
 
 export type DeliveryRow = {
   id: string;
@@ -120,6 +155,7 @@ function CreateWebhookForm({ projectId }: { projectId: string }) {
         <Label htmlFor="new-name">Name (optional)</Label>
         <Input id="new-name" name="name" placeholder="e.g. slack-alerts" />
       </div>
+      <EventFilterCheckboxes selected={null} />
       {state && "error" in state ? <p className="text-sm text-destructive">{state.error}</p> : null}
       <div className="flex gap-2">
         <Button type="submit" disabled={pending}>
@@ -180,6 +216,7 @@ function WebhookItem({
           />
           Enabled
         </label>
+        <EventFilterCheckboxes selected={webhook.events} />
         {updateState && "error" in updateState ? (
           <p className="text-xs text-destructive">{updateState.error}</p>
         ) : null}

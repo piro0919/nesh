@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { generateWebhookSecret, signPayload } from "./webhooks";
+import { generateWebhookSecret, shouldDeliver, signPayload } from "./webhooks";
 
 describe("signPayload", () => {
   it("produces a stable sha256= hex signature for the same body and secret", () => {
@@ -23,6 +23,24 @@ describe("signPayload", () => {
     expect(signPayload("hi", "k")).toBe(
       "sha256=233f8e9a13f278f19758a015d82f51e6e27966f1efc29d2cffb5d1a45ae9dc4c",
     );
+  });
+});
+
+describe("shouldDeliver", () => {
+  it("delivers every event when events is null (back-compat)", () => {
+    expect(shouldDeliver(null, "notification.sent")).toBe(true);
+    expect(shouldDeliver(null, "subscription.created")).toBe(true);
+    expect(shouldDeliver(null, "subscription.removed")).toBe(true);
+  });
+
+  it("delivers nothing when events is empty", () => {
+    expect(shouldDeliver([], "notification.sent")).toBe(false);
+  });
+
+  it("delivers only listed events", () => {
+    const filter = ["notification.sent"];
+    expect(shouldDeliver(filter, "notification.sent")).toBe(true);
+    expect(shouldDeliver(filter, "subscription.created")).toBe(false);
   });
 });
 

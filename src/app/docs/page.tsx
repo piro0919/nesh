@@ -223,6 +223,10 @@ Content-Type: application/json
               (30s → 2m → 10m → 1h, 5 attempts max). The <Code>X-Nesh-Attempt</Code> header counts
               the attempt number when retried.
             </p>
+            <p>
+              Each webhook can be filtered to a subset of event types from the project page. The
+              default (all checkboxes selected) subscribes the webhook to every event.
+            </p>
 
             <h3 className="text-lg font-medium">Events</h3>
             <Table

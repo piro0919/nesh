@@ -6,6 +6,20 @@ import { deliverTestWebhook, generateWebhookSecret } from "@/lib/webhooks";
 
 export type WebhookFormState = { error: string } | { ok: string } | undefined;
 
+const ALL_EVENT_TYPES = [
+  "notification.sent",
+  "subscription.created",
+  "subscription.removed",
+] as const;
+
+function parseEventsField(formData: FormData): string[] | null {
+  const raw = formData.getAll("events").map(String);
+  // Empty selection = subscribe to all (NULL). Filter to known types defensively.
+  const filtered = raw.filter((v) => (ALL_EVENT_TYPES as readonly string[]).includes(v));
+  if (filtered.length === 0 || filtered.length === ALL_EVENT_TYPES.length) return null;
+  return filtered;
+}
+
 function isValidWebhookUrl(value: string): boolean {
   try {
     const u = new URL(value);
@@ -28,12 +42,15 @@ export async function createWebhook(
   if (!isValidWebhookUrl(url)) return { error: "URL must be http(s)" };
   if (name.length > 100) return { error: "Name too long" };
 
+  const events = parseEventsField(formData);
+
   const supabase = await createClient();
   const { error } = await supabase.from("webhooks").insert({
     project_id: projectId,
     url,
     name: name || null,
     enabled: true,
+    events,
     secret: generateWebhookSecret(),
   });
   if (error) return { error: error.message };
@@ -55,10 +72,12 @@ export async function updateWebhook(
   if (!url) return { error: "URL is required" };
   if (!isValidWebhookUrl(url)) return { error: "URL must be http(s)" };
 
+  const events = parseEventsField(formData);
+
   const supabase = await createClient();
   const { error } = await supabase
     .from("webhooks")
-    .update({ url, name: name || null, enabled })
+    .update({ url, name: name || null, enabled, events })
     .eq("id", webhookId);
   if (error) return { error: error.message };
 
