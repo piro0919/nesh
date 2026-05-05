@@ -7,7 +7,7 @@ export default async function Page() {
   const supabase = await createClient();
   const { data: projects, error } = await supabase
     .from("projects")
-    .select("id, name, created_at")
+    .select("id, name, created_at, subscriptions(count)")
     .order("created_at", { ascending: false });
 
   if (error) throw error;
@@ -24,20 +24,24 @@ export default async function Page() {
         <p className="text-muted-foreground">No projects yet. Create your first one.</p>
       ) : (
         <ul className="flex flex-col gap-3">
-          {projects.map((p) => (
-            <li key={p.id}>
-              <Link href={`/projects/${p.id}`} className="block">
-                <Card className="transition hover:bg-muted/50">
-                  <CardHeader>
-                    <CardTitle>{p.name}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="text-xs text-muted-foreground">
-                    Created {new Date(p.created_at).toLocaleString()}
-                  </CardContent>
-                </Card>
-              </Link>
-            </li>
-          ))}
+          {projects.map((p) => {
+            const count = (p.subscriptions as { count: number }[])[0]?.count ?? 0;
+            return (
+              <li key={p.id}>
+                <Link href={`/projects/${p.id}`} className="block">
+                  <Card className="transition hover:bg-muted/50">
+                    <CardHeader>
+                      <CardTitle>{p.name}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="flex items-center justify-between text-xs text-muted-foreground">
+                      <span>Created {new Date(p.created_at).toLocaleString()}</span>
+                      <span>{count} subscribers</span>
+                    </CardContent>
+                  </Card>
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       )}
     </div>
