@@ -89,6 +89,12 @@ type WebhookRow = {
   secret: string;
 };
 
+/** NULL events = subscribe to everything (back-compat with rows created before the filter). */
+export function shouldDeliver(events: string[] | null, eventType: string): boolean {
+  if (events === null) return true;
+  return events.includes(eventType);
+}
+
 /**
  * Best-effort webhook delivery. Updates last_delivery_* on the row and
  * appends a row to webhook_deliveries regardless of outcome.
@@ -161,11 +167,13 @@ async function fireWebhook(projectId: string, payload: WebhookPayload): Promise<
     const supabase = createAdminClient();
     const { data: hooks } = await supabase
       .from("webhooks")
-      .select("id, url, secret")
+      .select("id, url, secret, events")
       .eq("project_id", projectId)
       .eq("enabled", true);
     if (!hooks || hooks.length === 0) return;
-    await Promise.all(hooks.map((h) => deliverOne(h, payload)));
+    const targets = hooks.filter((h) => shouldDeliver(h.events, payload.type));
+    if (targets.length === 0) return;
+    await Promise.all(targets.map((h) => deliverOne(h, payload)));
   } catch (err) {
     console.error(`[webhook] fireWebhook ${payload.type} failed`, err);
   }

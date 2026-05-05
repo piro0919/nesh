@@ -245,6 +245,7 @@ export type Database = {
         Row: {
           created_at: string
           enabled: boolean
+          events: string[] | null
           id: string
           last_delivery_at: string | null
           last_delivery_error: string | null
@@ -257,6 +258,7 @@ export type Database = {
         Insert: {
           created_at?: string
           enabled?: boolean
+          events?: string[] | null
           id?: string
           last_delivery_at?: string | null
           last_delivery_error?: string | null
@@ -269,6 +271,7 @@ export type Database = {
         Update: {
           created_at?: string
           enabled?: boolean
+          events?: string[] | null
           id?: string
           last_delivery_at?: string | null
           last_delivery_error?: string | null

@@ -46,7 +46,7 @@ export default async function Page({ params }: Props) {
   const { data: webhooks } = await supabase
     .from("webhooks")
     .select(
-      "id, name, url, secret, enabled, last_delivery_at, last_delivery_status, last_delivery_error",
+      "id, name, url, secret, enabled, events, last_delivery_at, last_delivery_status, last_delivery_error",
     )
     .eq("project_id", project.id)
     .order("created_at", { ascending: true });
