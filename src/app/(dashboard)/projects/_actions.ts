@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { encryptString } from "@/lib/crypto";
 import { createClient } from "@/lib/supabase/server";
 import { generateVapidKeys } from "@/lib/vapid";
 
@@ -19,6 +20,7 @@ export async function createProject(
   if (userError || !userData.user) return { error: "Not authenticated" };
 
   const { publicKey, privateKey } = generateVapidKeys();
+  const encryptedPrivateKey = await encryptString(privateKey);
 
   const { data: project, error } = await supabase
     .from("projects")
@@ -26,7 +28,7 @@ export async function createProject(
       user_id: userData.user.id,
       name,
       vapid_public_key: publicKey,
-      vapid_private_key: privateKey,
+      vapid_private_key: encryptedPrivateKey,
       vapid_subject: `mailto:${userData.user.email ?? "noreply@nesh.local"}`,
     })
     .select("id")
