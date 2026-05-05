@@ -8,6 +8,9 @@
     "start": "next start",
     "lint": "biome check .",
     "format": "biome format --write .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
     "db:start": "supabase start",
     "db:stop": "supabase stop",
     "db:reset": "supabase db reset",
@@ -35,14 +38,17 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.14",
+    "@playwright/test": "^1.59.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/web-push": "^3.6.4",
     "@vercel/config": "^0.3.0",
+    "@vitest/coverage-v8": "^4.1.5",
     "supabase": "^2.98.1",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.5"
   }
 }
