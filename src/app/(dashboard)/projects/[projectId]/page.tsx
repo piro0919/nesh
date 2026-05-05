@@ -1,13 +1,16 @@
 import { notFound } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getSiteUrl } from "@/lib/site-url";
 import { createClient } from "@/lib/supabase/server";
 import { DeleteProjectButton } from "./_components/delete-button";
+import { SdkSetup } from "./_components/sdk-setup";
 
 type Props = { params: Promise<{ projectId: string }> };
 
 export default async function Page({ params }: Props) {
   const { projectId } = await params;
   const supabase = await createClient();
+
   const { data: project, error } = await supabase
     .from("projects")
     .select("id, name, vapid_public_key, vapid_subject, created_at")
@@ -16,6 +19,13 @@ export default async function Page({ params }: Props) {
 
   if (error) throw error;
   if (!project) notFound();
+
+  const { count: subscriberCount } = await supabase
+    .from("subscriptions")
+    .select("*", { head: true, count: "exact" })
+    .eq("project_id", project.id);
+
+  const apiBase = `${getSiteUrl()}/api/v1/projects/${project.id}`;
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
@@ -28,23 +38,25 @@ export default async function Page({ params }: Props) {
           <CardTitle>Project info</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-2 text-sm">
-          <div>
-            <span className="text-muted-foreground">ID: </span>
-            <code className="text-xs">{project.id}</code>
-          </div>
-          <div>
-            <span className="text-muted-foreground">Created: </span>
-            {new Date(project.created_at).toLocaleString()}
-          </div>
-          <div>
-            <span className="text-muted-foreground">VAPID subject: </span>
-            <code className="text-xs">{project.vapid_subject}</code>
-          </div>
+          <Row label="ID" value={project.id} mono />
+          <Row label="Created" value={new Date(project.created_at).toLocaleString()} />
+          <Row label="VAPID subject" value={project.vapid_subject} mono />
+          <Row label="Subscribers" value={String(subscriberCount ?? 0)} />
         </CardContent>
       </Card>
+      <SdkSetup apiBase={apiBase} publicKey={project.vapid_public_key} />
       <p className="text-sm text-muted-foreground">
-        SDK setup info, subscriber count, and notifications will appear here in later phases.
+        Notification creation and history will appear here in the next phase.
       </p>
+    </div>
+  );
+}
+
+function Row({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
+  return (
+    <div>
+      <span className="text-muted-foreground">{label}: </span>
+      {mono ? <code className="text-xs">{value}</code> : <span>{value}</span>}
     </div>
   );
 }
