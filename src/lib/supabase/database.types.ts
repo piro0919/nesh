@@ -45,6 +45,7 @@ export type Database = {
           removed: number
           scheduled_at: string | null
           status: string
+          target_user_ids: string[] | null
           title: string
           url: string | null
         }
@@ -58,6 +59,7 @@ export type Database = {
           removed?: number
           scheduled_at?: string | null
           status?: string
+          target_user_ids?: string[] | null
           title: string
           url?: string | null
         }
@@ -71,6 +73,7 @@ export type Database = {
           removed?: number
           scheduled_at?: string | null
           status?: string
+          target_user_ids?: string[] | null
           title?: string
           url?: string | null
         }
@@ -140,6 +143,7 @@ export type Database = {
           auth: string
           created_at: string
           endpoint: string
+          external_user_id: string | null
           id: string
           p256dh: string
           project_id: string
@@ -148,6 +152,7 @@ export type Database = {
           auth: string
           created_at?: string
           endpoint: string
+          external_user_id?: string | null
           id?: string
           p256dh: string
           project_id: string
@@ -156,6 +161,7 @@ export type Database = {
           auth?: string
           created_at?: string
           endpoint?: string
+          external_user_id?: string | null
           id?: string
           p256dh?: string
           project_id?: string

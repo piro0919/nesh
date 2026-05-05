@@ -76,6 +76,11 @@ export async function POST(request: NextRequest, { params }: Params) {
     );
   }
 
+  const targetUserIds =
+    parsed.data.userIds && parsed.data.userIds.length > 0
+      ? Array.from(new Set(parsed.data.userIds))
+      : null;
+
   const { data: notification, error: insertError } = await supabase
     .from("notifications")
     .insert({
@@ -84,6 +89,7 @@ export async function POST(request: NextRequest, { params }: Params) {
       body: parsed.data.body,
       url: parsed.data.url ?? null,
       status: "pending",
+      target_user_ids: targetUserIds,
     })
     .select("id")
     .single();

@@ -8,7 +8,9 @@ export async function NotificationsList({ projectId }: Props) {
   const supabase = await createClient();
   const { data: notifications, error } = await supabase
     .from("notifications")
-    .select("id, title, body, url, scheduled_at, status, created_at, delivered, removed, failed")
+    .select(
+      "id, title, body, url, scheduled_at, status, created_at, delivered, removed, failed, target_user_ids",
+    )
     .eq("project_id", projectId)
     .order("created_at", { ascending: false })
     .limit(50);
@@ -44,6 +46,12 @@ export async function NotificationsList({ projectId }: Props) {
                       ? `Scheduled for ${new Date(n.scheduled_at).toLocaleString()}`
                       : `Sent ${new Date(n.created_at).toLocaleString()}`}
                   </span>
+                  {n.target_user_ids && n.target_user_ids.length > 0 ? (
+                    <span className="text-xs text-muted-foreground">
+                      Targeted: {n.target_user_ids.length} user
+                      {n.target_user_ids.length === 1 ? "" : "s"}
+                    </span>
+                  ) : null}
                   {n.status === "sent" ? (
                     <span className="text-xs text-muted-foreground">
                       {n.delivered} delivered

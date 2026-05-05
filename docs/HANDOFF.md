@@ -48,10 +48,12 @@
   - **P3 VAPID 暗号化** ✅ AES-256-GCM (32-byte key) で `projects.vapid_private_key` を暗号化保存。`src/lib/crypto.ts` の encryptString/decryptString。本番 env `VAPID_KEY_ENCRYPTION_KEY` 設定済
   - **P4 Analytics: delivered** ✅ `notifications.{delivered, removed, failed}` 列を追加、send 後に書き込み、履歴 UI で `<n> delivered · <m> removed · <k> failed` 表示
   - **P7 OG image** ✅ `/opengraph-image` の動的 PNG (1200×630)
+  - **Anti-abuse cap** ✅ Free tier hard caps: 1 project/user, 5K subs/project, 10K sends/project/UTC月。プロジェクト詳細に使用量表示。LP FAQ にも明記
+  - **P6 REST API 送信** ✅ `POST /api/v1/projects/<id>/notifications` Bearer auth。`projects.api_key` (`nesh_sk_*` 形式) 自動生成。詳細ページに API key カード (show/hide/copy/regenerate)。LP に "REST API" 訴求
+- **ブラウザ実機 E2E 確認済**: chrome-devtools MCP 経由で subscribe → cron で push → SW 受信 → showNotification 呼び出しまで全パス確認 (`getNotifications()` で 2 件確認)
 - 未着手:
   - **P5 external_user_id** — SDK (next-push) 側に option 追加が先決。Nesh 側は `subscriptions.external_user_id` 列追加 + 送信 UI のターゲット指定追加で対応予定
-  - **P6 REST API 送信** — `POST /api/v1/projects/<id>/notifications` で API key 認証 → 即時送信。`projects.api_key` 列 + ダッシュボード表示が必要
-  - ブラウザ実機での push 受信 E2E
+  - **Phase B (paid plans)** — Stripe Checkout 等。実需要が見えてから
 
 ## ブランド
 

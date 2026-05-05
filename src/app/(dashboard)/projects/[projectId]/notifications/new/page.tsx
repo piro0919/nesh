@@ -68,6 +68,21 @@ export default function Page({ params }: Props) {
         </label>
       </fieldset>
 
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="target_user_ids">Target user IDs (optional)</Label>
+        <textarea
+          id="target_user_ids"
+          name="target_user_ids"
+          rows={3}
+          placeholder="Leave empty to broadcast. Otherwise comma- or newline-separated."
+          className="rounded border px-3 py-2 text-sm"
+        />
+        <p className="text-xs text-muted-foreground">
+          Matches subscriptions whose <code>userId</code> (set via the SDK) is in this list. Empty =
+          send to all.
+        </p>
+      </div>
+
       {mode === "scheduled" ? (
         <div className="flex flex-col gap-2">
           <Label htmlFor="scheduled_at">Scheduled at (local time)</Label>

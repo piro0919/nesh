@@ -82,7 +82,7 @@ export async function POST(request: NextRequest, { params }: Params) {
   if (projectError) return jsonResponse({ error: projectError.message }, 500);
   if (!project) return jsonResponse({ error: "Project not found" }, 404);
 
-  const { endpoint, keys } = parsed.data;
+  const { endpoint, keys, userId } = parsed.data;
 
   // Enforce subscriber cap, but only for NEW endpoints (re-subscribes update existing rows)
   const { data: existing } = await supabase
@@ -113,6 +113,7 @@ export async function POST(request: NextRequest, { params }: Params) {
       endpoint,
       p256dh: keys.p256dh,
       auth: keys.auth,
+      external_user_id: userId ?? null,
     },
     { onConflict: "project_id,endpoint" },
   );
