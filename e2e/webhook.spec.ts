@@ -67,17 +67,17 @@ async function setup(page: Page): Promise<{ projectId: string; apiKey: string; s
 }
 
 async function configureWebhook(page: Page, url: string): Promise<string> {
+  // Open the create-webhook form, fill it, submit.
+  await page.getByRole("button", { name: /^add webhook$/i }).click();
   await page.getByLabel("Endpoint URL").fill(url);
-  await page.getByRole("button", { name: /create webhook/i }).click();
-  await expect(page.getByText("Saved.")).toBeVisible({ timeout: 5_000 });
+  await page.getByRole("button", { name: /^create$/i }).click();
 
-  // The SecretRow is rendered only when the page sees the webhook row, which
-  // happens on the next server-rendered visit. revalidatePath doesn't bring
-  // the SecretRow into the existing client tree, so reload to pick it up.
+  // Reload so the newly-inserted webhook row hydrates with its SecretRow.
+  await page.waitForTimeout(300);
   await page.reload();
 
-  // Reveal the secret. After reload, "Show" buttons exist for the API key
-  // card AND the webhook secret row — the webhook one is the second.
+  // Reveal the secret. The first "Show" belongs to the API key card; the
+  // second to the webhook secret row.
   await page
     .getByRole("button", { name: /^show$/i })
     .nth(1)

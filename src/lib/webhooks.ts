@@ -29,22 +29,18 @@ export function signPayload(body: string, secret: string): string {
 
 const TIMEOUT_MS = 5_000;
 
-/**
- * Fire-and-best-effort webhook delivery. Records last_delivery_* on the
- * webhook row regardless of outcome. Caller awaits at most TIMEOUT_MS.
- */
-export async function deliverWebhook(
-  projectId: string,
-  payload: NotificationSentPayload,
-): Promise<void> {
-  const supabase = createAdminClient();
-  const { data: hook, error } = await supabase
-    .from("webhooks")
-    .select("id, url, secret, enabled")
-    .eq("project_id", projectId)
-    .maybeSingle();
-  if (error || !hook || !hook.enabled) return;
+type WebhookRow = {
+  id: string;
+  url: string;
+  secret: string;
+};
 
+/**
+ * Best-effort webhook delivery. Updates last_delivery_* on the row and
+ * appends a row to webhook_deliveries regardless of outcome.
+ */
+async function deliverOne(hook: WebhookRow, payload: NotificationSentPayload): Promise<void> {
+  const supabase = createAdminClient();
   const body = JSON.stringify(payload);
   const signature = signPayload(body, hook.secret);
 
@@ -75,20 +71,30 @@ export async function deliverWebhook(
     clearTimeout(t);
   }
 
-  await supabase
-    .from("webhooks")
-    .update({
-      last_delivery_at: new Date().toISOString(),
-      last_delivery_status: status,
-      last_delivery_error: errorMessage,
-    })
-    .eq("id", hook.id);
+  // Run snapshot update + delivery log insert in parallel — they're independent.
+  await Promise.all([
+    supabase
+      .from("webhooks")
+      .update({
+        last_delivery_at: new Date().toISOString(),
+        last_delivery_status: status,
+        last_delivery_error: errorMessage,
+      })
+      .eq("id", hook.id),
+    supabase.from("webhook_deliveries").insert({
+      webhook_id: hook.id,
+      event_type: payload.type,
+      status_code: status,
+      error: errorMessage,
+      payload,
+    }),
+  ]);
 }
 
 /**
- * Convenience wrapper called after sendToProject succeeds. Fetches the
- * notification metadata, builds the payload, and fires the webhook.
- * Errors are swallowed — webhook delivery must never break the send flow.
+ * Convenience wrapper called after sendToProject succeeds. Fans out to
+ * every enabled webhook configured for the project. Errors are swallowed —
+ * webhook delivery must never break the send flow.
  */
 export async function fireSentWebhook(
   projectId: string,
@@ -103,7 +109,15 @@ export async function fireSentWebhook(
       .eq("id", notificationId)
       .maybeSingle();
     if (!n) return;
-    await deliverWebhook(projectId, {
+
+    const { data: hooks } = await supabase
+      .from("webhooks")
+      .select("id, url, secret")
+      .eq("project_id", projectId)
+      .eq("enabled", true);
+    if (!hooks || hooks.length === 0) return;
+
+    const payload: NotificationSentPayload = {
       type: "notification.sent",
       notification: {
         id: n.id,
@@ -117,8 +131,42 @@ export async function fireSentWebhook(
         target_user_ids: n.target_user_ids,
         sent_at: new Date().toISOString(),
       },
-    });
+    };
+
+    await Promise.all(hooks.map((h) => deliverOne(h, payload)));
   } catch (err) {
     console.error("[webhook] fireSentWebhook failed", err);
   }
+}
+
+/**
+ * Fire a one-off test delivery (used by the dashboard "Send test" button).
+ */
+export async function deliverTestWebhook(webhookId: string): Promise<void> {
+  const supabase = createAdminClient();
+  const { data: hook } = await supabase
+    .from("webhooks")
+    .select("id, url, secret, project_id")
+    .eq("id", webhookId)
+    .maybeSingle();
+  if (!hook) return;
+
+  await deliverOne(
+    { id: hook.id, url: hook.url, secret: hook.secret },
+    {
+      type: "notification.sent",
+      notification: {
+        id: "test_00000000",
+        project_id: hook.project_id,
+        title: "Test from Nesh",
+        body: "This is a test delivery from your dashboard.",
+        url: null,
+        delivered: 0,
+        removed: 0,
+        failed: 0,
+        target_user_ids: null,
+        sent_at: new Date().toISOString(),
+      },
+    },
+  );
 }
