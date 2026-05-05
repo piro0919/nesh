@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { sendToProject } from "@/lib/push/send";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { fireSentWebhook } from "@/lib/webhooks";
 
 export async function POST(request: NextRequest) {
   const auth = request.headers.get("authorization");
@@ -45,6 +46,7 @@ export async function POST(request: NextRequest) {
         })
         .eq("id", row.id);
       if (updateError) throw updateError;
+      await fireSentWebhook(row.project_id, row.id, sendResult);
       results.push({ id: row.id, status: "sent" });
     } catch (sendError) {
       results.push({
