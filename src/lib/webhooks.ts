@@ -1,4 +1,5 @@
 import { createHmac, randomBytes } from "node:crypto";
+import { logError } from "@/lib/error-log";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 type SendResult = { sent: number; removed: number; failed: number };
@@ -191,7 +192,10 @@ async function fireWebhook(projectId: string, payload: WebhookPayload): Promise<
     if (targets.length === 0) return;
     await Promise.all(targets.map((h) => deliverOne(h, payload)));
   } catch (err) {
-    console.error(`[webhook] fireWebhook ${payload.type} failed`, err);
+    await logError("webhook.fanout", err, {
+      projectId,
+      metadata: { eventType: payload.type },
+    });
   }
 }
 
@@ -283,7 +287,7 @@ export async function retryDueWebhooks(limit = 50): Promise<{ retried: number }>
     .limit(limit);
 
   if (error) {
-    console.error("[webhook] retryDueWebhooks lookup failed", error);
+    await logError("webhook.retry.lookup", error);
     return { retried: 0 };
   }
 
