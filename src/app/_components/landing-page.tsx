@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
@@ -24,27 +25,39 @@ export function LandingPage() {
       </header>
 
       <main className="flex-1">
-        <section className="mx-auto flex max-w-3xl flex-col items-center gap-6 px-6 py-24 text-center">
-          <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
-            Web Push notifications,
-            <br />
-            made simple.
-          </h1>
-          <p className="max-w-xl text-lg text-muted-foreground">
-            A lightweight alternative to OneSignal for Next.js / React projects. Sign up, drop the
-            SDK in, start sending — in minutes.
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            <Button asChild size="lg">
-              <Link href="/sign-up">Get started — free</Link>
-            </Button>
-            <Button asChild variant="outline" size="lg">
-              <Link href="https://github.com/piro0919/nesh" target="_blank" rel="noreferrer">
-                View on GitHub
-              </Link>
-            </Button>
+        <section className="mx-auto grid max-w-6xl items-center gap-12 px-6 py-20 md:grid-cols-2 md:py-24">
+          <div className="flex flex-col items-start gap-6 text-left">
+            <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
+              Web Push notifications,
+              <br />
+              made simple.
+            </h1>
+            <p className="max-w-xl text-lg text-muted-foreground">
+              A lightweight alternative to OneSignal for Next.js / React projects. Sign up, drop the
+              SDK in, start sending — in minutes.
+            </p>
+            <div className="flex flex-wrap items-center gap-3">
+              <Button asChild size="lg">
+                <Link href="/sign-up">Get started — free</Link>
+              </Button>
+              <Button asChild variant="outline" size="lg">
+                <Link href="https://github.com/piro0919/nesh" target="_blank" rel="noreferrer">
+                  View on GitHub
+                </Link>
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">Open source · MIT · Self-host friendly</p>
           </div>
-          <p className="text-xs text-muted-foreground">Open source · MIT · Self-host friendly</p>
+          <div className="hidden md:block">
+            <Image
+              src="/hero.png"
+              alt="A browser window with a Nesh push notification sliding in from the top right"
+              width={1200}
+              height={800}
+              priority
+              className="h-auto w-full"
+            />
+          </div>
         </section>
 
         <section className="border-t bg-muted/30">
