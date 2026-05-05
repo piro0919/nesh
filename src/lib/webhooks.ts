@@ -19,6 +19,36 @@ export type NotificationSentPayload = {
   };
 };
 
+export type SubscriptionCreatedPayload = {
+  type: "subscription.created";
+  subscription: {
+    id: string;
+    project_id: string;
+    endpoint: string;
+    external_user_id: string | null;
+    created_at: string;
+  };
+};
+
+export type SubscriptionRemovedPayload = {
+  type: "subscription.removed";
+  subscription: {
+    project_id: string;
+    endpoint: string;
+    external_user_id: string | null;
+    /** Why the subscription was removed:
+     *  - "client":   the client called DELETE / unsubscribe()
+     *  - "expired":  push service returned 404/410 during a send */
+    reason: "client" | "expired";
+    removed_at: string;
+  };
+};
+
+export type WebhookPayload =
+  | NotificationSentPayload
+  | SubscriptionCreatedPayload
+  | SubscriptionRemovedPayload;
+
 export function generateWebhookSecret(): string {
   return `whsec_${randomBytes(24).toString("base64url")}`;
 }
@@ -63,7 +93,7 @@ type WebhookRow = {
  * Best-effort webhook delivery. Updates last_delivery_* on the row and
  * appends a row to webhook_deliveries regardless of outcome.
  */
-async function deliverOne(hook: WebhookRow, payload: NotificationSentPayload): Promise<void> {
+async function deliverOne(hook: WebhookRow, payload: WebhookPayload): Promise<void> {
   const supabase = createAdminClient();
   const body = JSON.stringify(payload);
   const signature = signPayload(body, hook.secret);
@@ -122,51 +152,94 @@ async function deliverOne(hook: WebhookRow, payload: NotificationSentPayload): P
 }
 
 /**
- * Convenience wrapper called after sendToProject succeeds. Fans out to
- * every enabled webhook configured for the project. Errors are swallowed —
- * webhook delivery must never break the send flow.
+ * Generic fanout: deliver a payload to every enabled webhook configured for
+ * the project. Errors are swallowed so webhook delivery never breaks the
+ * caller's flow.
  */
-export async function fireSentWebhook(
-  projectId: string,
-  notificationId: string,
-  result: SendResult,
-): Promise<void> {
+async function fireWebhook(projectId: string, payload: WebhookPayload): Promise<void> {
   try {
     const supabase = createAdminClient();
-    const { data: n } = await supabase
-      .from("notifications")
-      .select("id, project_id, title, body, url, target_user_ids")
-      .eq("id", notificationId)
-      .maybeSingle();
-    if (!n) return;
-
     const { data: hooks } = await supabase
       .from("webhooks")
       .select("id, url, secret")
       .eq("project_id", projectId)
       .eq("enabled", true);
     if (!hooks || hooks.length === 0) return;
-
-    const payload: NotificationSentPayload = {
-      type: "notification.sent",
-      notification: {
-        id: n.id,
-        project_id: n.project_id,
-        title: n.title,
-        body: n.body,
-        url: n.url,
-        delivered: result.sent,
-        removed: result.removed,
-        failed: result.failed,
-        target_user_ids: n.target_user_ids,
-        sent_at: new Date().toISOString(),
-      },
-    };
-
     await Promise.all(hooks.map((h) => deliverOne(h, payload)));
   } catch (err) {
-    console.error("[webhook] fireSentWebhook failed", err);
+    console.error(`[webhook] fireWebhook ${payload.type} failed`, err);
   }
+}
+
+/** Fired after sendToProject completes (any of the 3 send sites). */
+export async function fireSentWebhook(
+  projectId: string,
+  notificationId: string,
+  result: SendResult,
+): Promise<void> {
+  const supabase = createAdminClient();
+  const { data: n } = await supabase
+    .from("notifications")
+    .select("id, project_id, title, body, url, target_user_ids")
+    .eq("id", notificationId)
+    .maybeSingle();
+  if (!n) return;
+
+  await fireWebhook(projectId, {
+    type: "notification.sent",
+    notification: {
+      id: n.id,
+      project_id: n.project_id,
+      title: n.title,
+      body: n.body,
+      url: n.url,
+      delivered: result.sent,
+      removed: result.removed,
+      failed: result.failed,
+      target_user_ids: n.target_user_ids,
+      sent_at: new Date().toISOString(),
+    },
+  });
+}
+
+/** Fired when a brand-new endpoint subscribes (not on re-subscribe upsert). */
+export async function fireSubscriptionCreated(
+  projectId: string,
+  subscription: {
+    id: string;
+    endpoint: string;
+    external_user_id: string | null;
+    created_at: string;
+  },
+): Promise<void> {
+  await fireWebhook(projectId, {
+    type: "subscription.created",
+    subscription: {
+      id: subscription.id,
+      project_id: projectId,
+      endpoint: subscription.endpoint,
+      external_user_id: subscription.external_user_id,
+      created_at: subscription.created_at,
+    },
+  });
+}
+
+/** Fired when a subscription is removed — by the client or by FCM 404/410. */
+export async function fireSubscriptionRemoved(
+  projectId: string,
+  subscription: { endpoint: string; external_user_id: string | null },
+  reason: "client" | "expired",
+): Promise<void> {
+  await fireWebhook(projectId, {
+    type: "subscription.removed",
+    subscription: {
+      project_id: projectId,
+      endpoint: subscription.endpoint,
+      external_user_id: subscription.external_user_id,
+      reason,
+      removed_at: new Date().toISOString(),
+    },
+  });
 }
 
 /**

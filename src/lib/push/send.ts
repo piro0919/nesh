@@ -1,6 +1,7 @@
 import webpush from "web-push";
 import { decryptString, isEncrypted } from "@/lib/crypto";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { fireSubscriptionRemoved } from "@/lib/webhooks";
 
 type SendResult = {
   attempted: number;
@@ -33,7 +34,7 @@ export async function sendToProject(
 
   let query = supabase
     .from("subscriptions")
-    .select("id, endpoint, p256dh, auth")
+    .select("id, endpoint, p256dh, auth, external_user_id")
     .eq("project_id", projectId);
   if (notification.target_user_ids && notification.target_user_ids.length > 0) {
     query = query.in("external_user_id", notification.target_user_ids);
@@ -81,6 +82,11 @@ export async function sendToProject(
       const status = (error as { statusCode?: number }).statusCode;
       if (status === 404 || status === 410) {
         await supabase.from("subscriptions").delete().eq("id", sub.id);
+        await fireSubscriptionRemoved(
+          projectId,
+          { endpoint: sub.endpoint, external_user_id: sub.external_user_id },
+          "expired",
+        );
         removed++;
       } else {
         failed++;
