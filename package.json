@@ -40,6 +40,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/web-push": "^3.6.4",
+    "@vercel/config": "^0.3.0",
     "supabase": "^2.98.1",
     "tailwindcss": "^4",
     "typescript": "^5"

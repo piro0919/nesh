@@ -20,13 +20,21 @@
   - プロジェクト CRUD: 一覧 / 作成（VAPID 自動生成）/ 詳細シェル / 削除
   - Route Group `(auth)` / `(dashboard)` でガード集約、`/` は認証状態に応じて redirect
   - Programmatic E2E（Supabase REST 経由のサインアップ → insert → select）で RLS が user スコープで効いていることを確認済み
-- 実装プラン Plan 3（購読エンドポイント + SDK セットアップ UI）：[`docs/plan/2026-05-05-subscription-endpoint.md`](./plan/2026-05-05-subscription-endpoint.md) — **完了**（`feat/subscription-endpoint` ブランチ）
+- 実装プラン Plan 3（購読エンドポイント + SDK セットアップ UI）：[`docs/plan/2026-05-05-subscription-endpoint.md`](./plan/2026-05-05-subscription-endpoint.md) — **完了**（main にマージ済み）
   - `POST /api/v1/projects/<id>` で購読登録（upsert）、`DELETE /api/v1/projects/<id>?endpoint=...` で解除（CORS 許可済）
   - service role クライアント (`src/lib/supabase/admin.ts`) で projectId 存在検証 + RLS バイパス
   - プロジェクト詳細に SDK セットアップ情報（apiBase / publicKey / 使用例 + コピーボタン）と購読者数を表示
   - プロジェクト一覧カードにも購読者数を表示
-  - E2E: 3 件 insert → count=3、1 件 delete → count=2 を確認済み
-- 未着手：Plan 4（通知送信 + Cron + 履歴 UI）、Vercel デプロイ、next-push 0.4 リリース
+- 実装プラン Plan 4（通知送信 + Cron + 履歴 UI）：[`docs/plan/2026-05-05-notifications.md`](./plan/2026-05-05-notifications.md) — **完了**（`feat/notifications` ブランチ）
+  - `web-push` で `sendToProject()`(404/410 時は subscription 自動削除)
+  - 通知作成フォーム(immediate / scheduled モード切替)
+  - 即時送信時は Server Action 内で同期送信 → status='sent'
+  - 予約送信は `notifications` に書き込んで Cron 待ち
+  - `/api/cron/dispatch` が `Authorization: Bearer $CRON_SECRET` で認可、pending かつ scheduled_at <= now() を拾って送信
+  - `vercel.ts` で毎分の Cron 設定 (`@vercel/config`)
+  - 詳細ページに履歴リスト、pending は Cancel / sent は Delete
+  - E2E: 過去日時 pending → cron で sent、未来日時 pending は拾われない、2 回目以降は idempotent を確認済み
+- 未着手：Vercel デプロイ + 本番環境変数設定、next-push 0.4 リリース、ブラウザ実機での push 受信確認
 
 ## ブランド
 
@@ -55,9 +63,9 @@
 
 Plan 1 の完了を受けて、残りは以下の順で進める想定（Plan 2 以降のプラン書き起こしから着手）:
 
-1. **Plan 4: 通知送信（即時 + 予約 + Cron）+ 履歴 UI** — 通知作成、即時送信、予約送信、Vercel Cron でのディスパッチ、送信履歴一覧
-2. **Vercel デプロイ + 本番 Supabase 接続** — 環境変数設定、Cron スケジュール登録
-3. **next-push 0.4 リリース** — `usePush` に `apiBase` オプションを追加（別リポジトリ `piro0919/next-push` での作業、Plan 3 の購読エンドポイントを実 SDK と繋ぐのに必要）
+1. **Vercel デプロイ + 本番環境変数設定** — Supabase 本番プロジェクト作成、`NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` / `SUPABASE_SERVICE_ROLE_KEY` / `NEXT_PUBLIC_SITE_URL` / `CRON_SECRET` 登録、Cron が毎分動くことを確認
+2. **next-push 0.4 リリース** — `usePush` に `apiBase` オプションを追加（別リポジトリ `piro0919/next-push` での作業）。Nesh の `apiBase = /api/v1/projects/<id>` を指せるようにする
+3. **ブラウザ実機での End-to-End 確認** — 利用者サンプルアプリ → next-push 0.4 で購読登録 → Nesh ダッシュボードから即時送信 → ブラウザで通知受信、までを通す
 
 ### 手動ブラウザテスト（推奨）
 

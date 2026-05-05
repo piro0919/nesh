@@ -1,0 +1,75 @@
+import webpush from "web-push";
+import { createAdminClient } from "@/lib/supabase/admin";
+
+type SendResult = {
+  attempted: number;
+  sent: number;
+  removed: number;
+  failed: number;
+};
+
+export async function sendToProject(
+  projectId: string,
+  notificationId: string,
+): Promise<SendResult> {
+  const supabase = createAdminClient();
+
+  const { data: project, error: projectError } = await supabase
+    .from("projects")
+    .select("vapid_public_key, vapid_private_key, vapid_subject")
+    .eq("id", projectId)
+    .maybeSingle();
+  if (projectError) throw projectError;
+  if (!project) throw new Error("Project not found");
+
+  const { data: notification, error: notificationError } = await supabase
+    .from("notifications")
+    .select("title, body, url")
+    .eq("id", notificationId)
+    .maybeSingle();
+  if (notificationError) throw notificationError;
+  if (!notification) throw new Error("Notification not found");
+
+  const { data: subscriptions, error: subsError } = await supabase
+    .from("subscriptions")
+    .select("id, endpoint, p256dh, auth")
+    .eq("project_id", projectId);
+  if (subsError) throw subsError;
+
+  webpush.setVapidDetails(
+    project.vapid_subject,
+    project.vapid_public_key,
+    project.vapid_private_key,
+  );
+
+  const payload = JSON.stringify({
+    title: notification.title,
+    body: notification.body,
+    url: notification.url ?? undefined,
+  });
+
+  let sent = 0;
+  let removed = 0;
+  let failed = 0;
+
+  for (const sub of subscriptions ?? []) {
+    try {
+      await webpush.sendNotification(
+        { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
+        payload,
+      );
+      sent++;
+    } catch (error) {
+      const status = (error as { statusCode?: number }).statusCode;
+      if (status === 404 || status === 410) {
+        await supabase.from("subscriptions").delete().eq("id", sub.id);
+        removed++;
+      } else {
+        failed++;
+        console.error("[push] send failed", { subscriptionId: sub.id, error });
+      }
+    }
+  }
+
+  return { attempted: subscriptions?.length ?? 0, sent, removed, failed };
+}
