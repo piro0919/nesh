@@ -13,7 +13,7 @@ import { ExportCard } from "./_components/export-card";
 import { NotificationsList } from "./_components/notifications-list";
 import { ProjectName } from "./_components/project-name";
 import { SdkSetup } from "./_components/sdk-setup";
-import { WebhookCard } from "./_components/webhook-card";
+import { WebhooksCard } from "./_components/webhook-card";
 
 type Props = { params: Promise<{ projectId: string }> };
 
@@ -43,11 +43,43 @@ export default async function Page({ params }: Props) {
     .eq("project_id", project.id)
     .gte("created_at", startOfCurrentMonthUtc().toISOString());
 
-  const { data: webhook } = await supabase
+  const { data: webhooks } = await supabase
     .from("webhooks")
-    .select("url, secret, enabled, last_delivery_at, last_delivery_status, last_delivery_error")
+    .select(
+      "id, name, url, secret, enabled, last_delivery_at, last_delivery_status, last_delivery_error",
+    )
     .eq("project_id", project.id)
-    .maybeSingle();
+    .order("created_at", { ascending: true });
+
+  const webhookIds = (webhooks ?? []).map((w) => w.id);
+  const { data: deliveries } =
+    webhookIds.length > 0
+      ? await supabase
+          .from("webhook_deliveries")
+          .select("id, webhook_id, event_type, status_code, error, created_at")
+          .in("webhook_id", webhookIds)
+          .order("created_at", { ascending: false })
+          .limit(200)
+      : {
+          data: [] as Array<{
+            id: string;
+            webhook_id: string;
+            event_type: string;
+            status_code: number | null;
+            error: string | null;
+            created_at: string;
+          }>,
+        };
+
+  const deliveriesByWebhook: Record<string, NonNullable<typeof deliveries>> = {};
+  for (const d of deliveries ?? []) {
+    if (!deliveriesByWebhook[d.webhook_id]) deliveriesByWebhook[d.webhook_id] = [];
+    deliveriesByWebhook[d.webhook_id].push(d);
+  }
+  // Cap each webhook's list to 20 most recent for the UI.
+  for (const k of Object.keys(deliveriesByWebhook)) {
+    deliveriesByWebhook[k] = deliveriesByWebhook[k].slice(0, 20);
+  }
 
   const apiBase = `${getSiteUrl()}/api/v1/projects/${project.id}`;
   const subs = subscriberCount ?? 0;
@@ -103,7 +135,11 @@ export default async function Page({ params }: Props) {
         defaultIcon={project.default_icon}
         defaultBadge={project.default_badge}
       />
-      <WebhookCard projectId={project.id} webhook={webhook ?? null} />
+      <WebhooksCard
+        projectId={project.id}
+        webhooks={webhooks ?? []}
+        deliveriesByWebhook={deliveriesByWebhook}
+      />
       <ExportCard projectId={project.id} />
       <NotificationsList projectId={project.id} />
     </div>

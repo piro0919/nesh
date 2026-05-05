@@ -197,6 +197,44 @@ export type Database = {
           },
         ]
       }
+      webhook_deliveries: {
+        Row: {
+          created_at: string
+          error: string | null
+          event_type: string
+          id: string
+          payload: Json | null
+          status_code: number | null
+          webhook_id: string
+        }
+        Insert: {
+          created_at?: string
+          error?: string | null
+          event_type: string
+          id?: string
+          payload?: Json | null
+          status_code?: number | null
+          webhook_id: string
+        }
+        Update: {
+          created_at?: string
+          error?: string | null
+          event_type?: string
+          id?: string
+          payload?: Json | null
+          status_code?: number | null
+          webhook_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "webhook_deliveries_webhook_id_fkey"
+            columns: ["webhook_id"]
+            isOneToOne: false
+            referencedRelation: "webhooks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       webhooks: {
         Row: {
           created_at: string
@@ -205,6 +243,7 @@ export type Database = {
           last_delivery_at: string | null
           last_delivery_error: string | null
           last_delivery_status: number | null
+          name: string | null
           project_id: string
           secret: string
           url: string
@@ -216,6 +255,7 @@ export type Database = {
           last_delivery_at?: string | null
           last_delivery_error?: string | null
           last_delivery_status?: number | null
+          name?: string | null
           project_id: string
           secret: string
           url: string
@@ -227,6 +267,7 @@ export type Database = {
           last_delivery_at?: string | null
           last_delivery_error?: string | null
           last_delivery_status?: number | null
+          name?: string | null
           project_id?: string
           secret?: string
           url?: string
@@ -235,7 +276,7 @@ export type Database = {
           {
             foreignKeyName: "webhooks_project_id_fkey"
             columns: ["project_id"]
-            isOneToOne: true
+            isOneToOne: false
             referencedRelation: "projects"
             referencedColumns: ["id"]
           },
