@@ -1,4 +1,4 @@
-# Handoff — 2026-04-27
+# Handoff — 2026-05-05
 
 次回セッションで本プロジェクトを再開するための引き継ぎメモ。
 
@@ -6,9 +6,15 @@
 
 - リポジトリ作成済み：[`piro0919/nesh`](https://github.com/piro0919/nesh)（public, MIT）
 - ローカル：`/Users/piro/Repository/nesh`
-- Next.js 16 (App Router, TypeScript, Tailwind v4, Turbopack, src ディレクトリ, ESLint なし) のスキャフォールド完了
+- Next.js 16 (App Router, TypeScript, Tailwind v4, Turbopack, src ディレクトリ) のスキャフォールド完了
 - 設計書：[`docs/spec/2026-04-27-push-saas-mvp-design.md`](./spec/2026-04-27-push-saas-mvp-design.md) に集約済み
-- まだ未着手：実装プラン、Supabase 連携、shadcn/ui 導入、Lint（Biome）導入、その他のセットアップ
+- 実装プラン Plan 1（基盤）：[`docs/plan/2026-05-05-mvp-foundation.md`](./plan/2026-05-05-mvp-foundation.md) — **完了**（`feat/mvp-foundation` ブランチ）
+  - Biome（lint + format）導入済み
+  - Supabase ローカルスタック構築済み（`pnpm db:start` で起動）
+  - 初期マイグレーション適用済み（`projects` / `subscriptions` / `notifications` + RLS）
+  - Supabase 型生成・Server / Browser クライアント・`src/proxy.ts`（Next.js 16 の middleware 後継）整備済み
+  - shadcn/ui 初期化 + Button コンポーネント追加済み
+- 未着手：Plan 2 以降（認証、プロジェクト CRUD、購読エンドポイント、通知送信、Cron、履歴 UI）
 
 ## ブランド
 
@@ -35,29 +41,13 @@
 
 ## 次のステップ
 
-優先順に：
+Plan 1 の完了を受けて、残りは以下の順で進める想定（Plan 2 以降のプラン書き起こしから着手）:
 
-1. **実装プランの作成**（`superpowers:writing-plans` skill を使う）
-   - 設計書を入力に、ステップ単位の実装計画を書く
-   - 出力先：`docs/plan/2026-04-XX-mvp-implementation.md`（仮）
-
-2. **next-push 0.4 リリース**
-   - `usePush` に `apiBase` オプションを追加（SDK が SaaS 側エンドポイントを指せるように）
-   - SaaS 側のエンドポイント仕様は `createPushHandler` プロトコルと完全互換にする予定
-   - 別リポジトリ（`piro0919/next-push`）での作業
-
-3. **Supabase プロジェクトの作成**
-   - DB / Auth / RLS の設定
-   - 環境変数を Vercel に登録
-
-4. **マイグレーションと初期 RLS ポリシー作成**
-5. **認証フロー実装**（Supabase Auth）
-6. **プロジェクト CRUD**
-7. **SDK セットアップ画面**（`apiBase` / `publicKey` のコピー UI）
-8. **購読登録エンドポイント**（`@piro0919/next-push/server` の `createPushHandler` を使う）
-9. **通知作成・送信フロー**（即時 + 予約）
-10. **Vercel Cron 設定**（予約送信のディスパッチ）
-11. **送信履歴 UI**
+1. **Plan 2: 認証 + プロジェクト CRUD** — Supabase Auth フロー、サインアップ/サインイン、プロジェクト一覧・作成・詳細・削除、VAPID 自動生成
+2. **Plan 3: 購読エンドポイント + SDK セットアップ画面** — `@piro0919/next-push/server` の `createPushHandler` 互換エンドポイント、`apiBase` / `publicKey` コピー UI
+3. **Plan 4: 通知送信（即時 + 予約 + Cron）+ 履歴 UI** — 通知作成、即時送信、予約送信、Vercel Cron でのディスパッチ、送信履歴一覧
+4. **Vercel デプロイ + 本番 Supabase 接続** — 環境変数設定、Cron スケジュール登録
+5. **next-push 0.4 リリース** — `usePush` に `apiBase` オプションを追加（別リポジトリ `piro0919/next-push` での作業、Plan 3 の動作確認に必要）
 
 ## 後回し項目（実利用後に検討）
 
