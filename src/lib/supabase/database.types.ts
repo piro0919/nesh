@@ -206,6 +206,7 @@ export type Database = {
           id: string
           next_attempt_at: string | null
           payload: Json | null
+          response_body: string | null
           status_code: number | null
           webhook_id: string
         }
@@ -217,6 +218,7 @@ export type Database = {
           id?: string
           next_attempt_at?: string | null
           payload?: Json | null
+          response_body?: string | null
           status_code?: number | null
           webhook_id: string
         }
@@ -228,6 +230,7 @@ export type Database = {
           id?: string
           next_attempt_at?: string | null
           payload?: Json | null
+          response_body?: string | null
           status_code?: number | null
           webhook_id?: string
         }

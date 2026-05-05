@@ -58,6 +58,19 @@ export function signPayload(body: string, secret: string): string {
 }
 
 const TIMEOUT_MS = 5_000;
+const RESPONSE_BODY_MAX = 4_096;
+
+async function readTruncatedBody(res: Response): Promise<string | null> {
+  try {
+    const text = await res.text();
+    if (text.length === 0) return null;
+    return text.length > RESPONSE_BODY_MAX
+      ? `${text.slice(0, RESPONSE_BODY_MAX)}…[truncated]`
+      : text;
+  } catch {
+    return null;
+  }
+}
 
 // Exponential backoff schedule (in milliseconds) used after a retryable
 // failure. Index = current attempt count (1-based). After MAX_ATTEMPTS
@@ -109,6 +122,7 @@ async function deliverOne(hook: WebhookRow, payload: WebhookPayload): Promise<vo
 
   let status: number | null = null;
   let errorMessage: string | null = null;
+  let responseBody: string | null = null;
   try {
     const res = await fetch(hook.url, {
       method: "POST",
@@ -122,6 +136,7 @@ async function deliverOne(hook: WebhookRow, payload: WebhookPayload): Promise<vo
       signal: controller.signal,
     });
     status = res.status;
+    responseBody = await readTruncatedBody(res);
     if (!res.ok) {
       errorMessage = `HTTP ${res.status}`;
     }
@@ -153,6 +168,7 @@ async function deliverOne(hook: WebhookRow, payload: WebhookPayload): Promise<vo
       payload,
       attempts: 1,
       next_attempt_at,
+      response_body: responseBody,
     }),
   ]);
 }
@@ -299,6 +315,7 @@ export async function retryDueWebhooks(limit = 50): Promise<{ retried: number }>
 
     let status: number | null = null;
     let errorMessage: string | null = null;
+    let responseBody: string | null = null;
     try {
       const res = await fetch(hook.url, {
         method: "POST",
@@ -313,6 +330,7 @@ export async function retryDueWebhooks(limit = 50): Promise<{ retried: number }>
         signal: controller.signal,
       });
       status = res.status;
+      responseBody = await readTruncatedBody(res);
       if (!res.ok) errorMessage = `HTTP ${res.status}`;
     } catch (err) {
       errorMessage = err instanceof Error ? err.message : "Unknown error";
@@ -340,6 +358,7 @@ export async function retryDueWebhooks(limit = 50): Promise<{ retried: number }>
           error: errorMessage,
           attempts: attempt,
           next_attempt_at,
+          response_body: responseBody,
         })
         .eq("id", row.id),
     ]);
