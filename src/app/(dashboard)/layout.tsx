@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { getCurrentUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { AppSidebar } from "./_components/app-sidebar";
@@ -26,14 +27,16 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const defaultOpen = cookieStore.get("sidebar_state")?.value !== "false";
 
   return (
-    <SidebarProvider defaultOpen={defaultOpen}>
-      <AppSidebar email={user.email ?? ""} isAdmin={isAdmin} projects={projects ?? []} />
-      <SidebarInset>
-        <header className="flex h-12 items-center gap-2 border-b px-4">
-          <SidebarTrigger />
-        </header>
-        <div className="flex-1 p-4 sm:p-6">{children}</div>
-      </SidebarInset>
-    </SidebarProvider>
+    <TooltipProvider delayDuration={0}>
+      <SidebarProvider defaultOpen={defaultOpen}>
+        <AppSidebar email={user.email ?? ""} isAdmin={isAdmin} projects={projects ?? []} />
+        <SidebarInset>
+          <header className="flex h-12 items-center gap-2 border-b px-4">
+            <SidebarTrigger />
+          </header>
+          <div className="flex-1 p-4 sm:p-6">{children}</div>
+        </SidebarInset>
+      </SidebarProvider>
+    </TooltipProvider>
   );
 }

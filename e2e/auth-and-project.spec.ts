@@ -12,7 +12,7 @@ test("sign up, create a project, and see SDK setup", async ({ page }) => {
   // Sign up
   await page.goto("/sign-up");
   await page.getByLabel("Email").fill(email);
-  await page.getByLabel("Password").fill(PASSWORD);
+  await page.getByLabel("Password", { exact: true }).fill(PASSWORD);
   await page.getByRole("button", { name: /create account/i }).click();
 
   // After sign-up the app routes us into /projects (or onto sign-in if email

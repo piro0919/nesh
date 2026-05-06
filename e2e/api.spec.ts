@@ -22,7 +22,7 @@ type Setup = {
 async function setup(page: Page): Promise<Setup> {
   await page.goto("/sign-up");
   await page.getByLabel("Email").fill(randomEmail());
-  await page.getByLabel("Password").fill(PASSWORD);
+  await page.getByLabel("Password", { exact: true }).fill(PASSWORD);
   await page.getByRole("button", { name: /create account/i }).click();
   await page.waitForURL(/\/projects(\b|\/)/, { timeout: 15_000 });
 
