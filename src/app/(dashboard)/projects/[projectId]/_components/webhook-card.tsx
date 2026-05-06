@@ -90,7 +90,7 @@ export function WebhooksCard({ projectId, webhooks, deliveriesByWebhook }: Props
           Each enabled webhook receives a signed <code>POST</code> after every successful send.
           Verify with <code>X-Nesh-Signature</code> (<code>sha256=&lt;hex hmac of body&gt;</code>).
           See{" "}
-          <a href="/docs#webhooks" className="underline-offset-2 hover:underline">
+          <a href="/docs/webhooks" className="underline-offset-2 hover:underline">
             /docs
           </a>
           .
