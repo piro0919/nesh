@@ -6,17 +6,17 @@ test.describe("landing page", () => {
   }) => {
     await page.goto("/");
     await expect(page.getByRole("heading", { level: 1 })).toContainText("Web Push notifications");
-    await expect(page.getByRole("link", { name: "Get started — free" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "View on GitHub" })).toBeVisible();
-    // The branded sections we shipped earlier:
-    await expect(page.getByText("The dashboard", { exact: true })).toBeVisible();
-    await expect(page.getByText("How it works", { exact: true })).toBeVisible();
-    await expect(page.getByText("FAQ", { exact: true })).toBeVisible();
+    // Multiple "Start free" CTAs (header, hero, final) — assert at least one is visible.
+    await expect(page.getByRole("link", { name: "Start free" }).first()).toBeVisible();
+    await expect(page.getByRole("link", { name: "Read the docs" }).first()).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Where Nesh fits/ })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /From signup to first send/ })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "FAQ" })).toBeVisible();
   });
 
-  test("Get started CTA links to sign-up", async ({ page }) => {
+  test("Start free CTA links to sign-up", async ({ page }) => {
     await page.goto("/");
-    await page.getByRole("link", { name: "Get started — free" }).click();
+    await page.getByRole("link", { name: "Start free" }).first().click();
     await expect(page).toHaveURL(/\/sign-up$/);
   });
 });

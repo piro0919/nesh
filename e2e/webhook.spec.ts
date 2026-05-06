@@ -43,7 +43,7 @@ function startReceiver(): { server: Server; url: () => string; hits: Hit[] } {
 async function setup(page: Page): Promise<{ projectId: string; apiKey: string; secret: string }> {
   await page.goto("/sign-up");
   await page.getByLabel("Email").fill(randomEmail());
-  await page.getByLabel("Password").fill(PASSWORD);
+  await page.getByLabel("Password", { exact: true }).fill(PASSWORD);
   await page.getByRole("button", { name: /create account/i }).click();
   await page.waitForURL(/\/projects(\b|\/)/, { timeout: 15_000 });
 
