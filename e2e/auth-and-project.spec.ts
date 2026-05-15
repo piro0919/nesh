@@ -19,8 +19,8 @@ test("sign up, create a project, and see SDK setup", async ({ page }) => {
   // confirmation is required — the local Supabase config has confirmations off).
   await page.waitForURL(/\/projects(\b|\/)/, { timeout: 15_000 });
 
-  // Empty state: a "New project" affordance should be visible.
-  await page.getByRole("link", { name: /new project/i }).click();
+  // Empty state shows both a header button and an empty-state CTA — either is fine.
+  await page.getByRole("link", { name: /new project/i }).first().click();
   await expect(page).toHaveURL(/\/projects\/new$/);
 
   // Create a project with a unique name.

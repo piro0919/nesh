@@ -27,7 +27,7 @@ async function setup(page: Page): Promise<Setup> {
   await page.getByRole("button", { name: /create account/i }).click();
   await page.waitForURL(/\/projects(\b|\/)/, { timeout: 15_000 });
 
-  await page.getByRole("link", { name: /new project/i }).click();
+  await page.getByRole("link", { name: /new project/i }).first().click();
   const projectName = `api-${Date.now()}`;
   await page.getByLabel("Name").fill(projectName);
   await page.getByRole("button", { name: /^create/i }).click();
