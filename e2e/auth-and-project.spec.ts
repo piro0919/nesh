@@ -20,7 +20,10 @@ test("sign up, create a project, and see SDK setup", async ({ page }) => {
   await page.waitForURL(/\/projects(\b|\/)/, { timeout: 15_000 });
 
   // Empty state shows both a header button and an empty-state CTA — either is fine.
-  await page.getByRole("link", { name: /new project/i }).first().click();
+  await page
+    .getByRole("link", { name: /new project/i })
+    .first()
+    .click();
   await expect(page).toHaveURL(/\/projects\/new$/);
 
   // Create a project with a unique name.

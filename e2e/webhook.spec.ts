@@ -48,7 +48,10 @@ async function setup(page: Page): Promise<{ projectId: string; apiKey: string; s
   await page.getByRole("button", { name: /create account/i }).click();
   await page.waitForURL(/\/projects(\b|\/)/, { timeout: 15_000 });
 
-  await page.getByRole("link", { name: /new project/i }).first().click();
+  await page
+    .getByRole("link", { name: /new project/i })
+    .first()
+    .click();
   await page.getByLabel("Name").fill(`wh-${Date.now()}`);
   await page.getByRole("button", { name: /^create/i }).click();
   await page.waitForURL(/\/projects\/[0-9a-f-]{36}\b/, { timeout: 15_000 });
