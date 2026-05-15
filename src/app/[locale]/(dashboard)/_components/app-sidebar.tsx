@@ -1,11 +1,8 @@
 "use client";
 
-import { BookOpen, FolderKanban, LogOut, Shield, User } from "lucide-react";
+import { BookOpen, FolderKanban, Shield, User } from "lucide-react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
-import { signOut } from "@/app/[locale]/(auth)/_actions";
-import { LanguageSwitcher } from "@/components/language-switcher";
-import { ThemeToggle } from "@/components/theme-toggle";
 import {
   Sidebar,
   SidebarContent,
@@ -19,6 +16,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Link, usePathname } from "@/i18n/navigation";
 import { ProjectSidebarNav } from "./project-sidebar-nav";
+import { UserMenu } from "./user-menu";
 
 type Project = { id: string; name: string };
 
@@ -105,19 +103,11 @@ export function AppSidebar({ email, isAdmin, projects }: Props) {
       </SidebarContent>
 
       <SidebarFooter>
-        <div className="flex items-center gap-1 px-2 py-2 group-data-[collapsible=icon]:hidden">
-          <LanguageSwitcher className="flex-1 justify-center" />
-          <ThemeToggle />
-        </div>
-        <div className="px-2 py-1 text-xs text-muted-foreground group-data-[collapsible=icon]:hidden">
-          {email}
-        </div>
-        <form action={signOut}>
-          <SidebarMenuButton type="submit" tooltip={t("signOut")}>
-            <LogOut />
-            <span>{t("signOut")}</span>
-          </SidebarMenuButton>
-        </form>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <UserMenu email={email} side="right" />
+          </SidebarMenuItem>
+        </SidebarMenu>
       </SidebarFooter>
     </Sidebar>
   );

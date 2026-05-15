@@ -422,6 +422,12 @@
       "docs": "Docs",
       "signOut": "Sign out"
     },
+    "mobileNav": {
+      "primary": "Primary navigation",
+      "more": "More",
+      "projectSection": "This project",
+      "appSection": "App"
+    },
     "projectNav": {
       "overview": "Overview",
       "notifications": "Notifications",

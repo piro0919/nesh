@@ -419,6 +419,12 @@
       "docs": "ドキュメント",
       "signOut": "ログアウト"
     },
+    "mobileNav": {
+      "primary": "メインナビゲーション",
+      "more": "その他",
+      "projectSection": "このプロジェクト",
+      "appSection": "アプリ"
+    },
     "projectNav": {
       "overview": "概要",
       "notifications": "通知",
