@@ -1,0 +1,722 @@
+{
+  "metadata": {
+    "title": "Nesh — Web Push, made simple",
+    "description": "A lightweight Web Push SaaS for Next.js / React projects. The hosted alternative to OneSignal — sign up, drop the SDK in, start sending."
+  },
+  "common": {
+    "language": "Language",
+    "toggleTheme": "Toggle theme",
+    "signIn": "Sign in",
+    "signUp": "Sign up",
+    "getStarted": "Get started",
+    "docs": "Docs",
+    "github": "GitHub"
+  },
+  "landing": {
+    "nav": {
+      "docs": "Docs",
+      "github": "GitHub",
+      "signIn": "Sign in",
+      "getStarted": "Get started"
+    },
+    "hero": {
+      "badge": "Open source · Free during early access",
+      "titleLine1": "Web Push notifications,",
+      "titleLine2": "made simple.",
+      "subtitle": "A lightweight alternative to OneSignal for Next.js / React projects. Sign up, drop the SDK in, and start sending — in minutes.",
+      "ctaPrimary": "Start free",
+      "ctaSecondary": "Read the docs",
+      "ctaFooter": "No credit card · MIT licensed · Self-host friendly",
+      "imageAlt": "A browser window with a Nesh push notification sliding in from the top right",
+      "samples": [
+        {
+          "title": "Web Push, delivered",
+          "body": "The notification you sent 2 minutes ago was just delivered."
+        },
+        { "title": "Daily summary", "body": "Yesterday: 1,247 sends · 832 shown · 198 clicked." },
+        { "title": "New follower", "body": "@alice just started following you." },
+        { "title": "Webhook signed", "body": "notification.sent fired with X-Nesh-Signature." },
+        { "title": "Subscriber milestone", "body": "5,000 subscribers reached on project demo." }
+      ]
+    },
+    "trust": {
+      "item1": "Built on Next.js 16",
+      "item2": "Postgres + RLS via Supabase",
+      "item3": "VAPID + Web Push standards",
+      "item4": "HMAC-signed webhooks"
+    },
+    "features": {
+      "title": "The features you need to send. Nothing else.",
+      "subtitle": "No segmentation. No journeys. No A/B tests. Just reliable Web Push.",
+      "items": {
+        "send": {
+          "title": "Send in seconds",
+          "body": "Compose in the dashboard or POST to a Bearer-auth endpoint. Synchronous response includes per-subscriber delivery counts."
+        },
+        "rest": {
+          "title": "REST API",
+          "body": "One endpoint per project. Use it from any backend, CI, or curl. No SDK required on the server."
+        },
+        "userIds": {
+          "title": "External user IDs",
+          "body": "Tag subscriptions with your own user IDs and target sends by user from the dashboard or REST."
+        },
+        "webhooks": {
+          "title": "Signed webhooks",
+          "body": "HMAC-SHA256 signatures, exponential-backoff retry, per-event filtering. Delivery log + replay UI included."
+        },
+        "analytics": {
+          "title": "Built-in analytics",
+          "body": "Shown / clicked beacons fire from the SDK service worker — no extra tools to wire up."
+        },
+        "openSource": {
+          "title": "Open source",
+          "body": "MIT licensed end-to-end. Read the code, fork it, audit the storage. Self-hosting guide included."
+        }
+      }
+    },
+    "comparison": {
+      "title": "Web Push only. Nothing else.",
+      "subtitle": "We skip the marketing-suite features on purpose. In return you get readable code, ownership of your data, and no vendor lock-in.",
+      "colFeature": "Feature",
+      "colNesh": "Nesh",
+      "colOneSignal": "OneSignal",
+      "colRollOwn": "Roll your own",
+      "rows": {
+        "time": {
+          "feature": "Time to first notification",
+          "nesh": "Minutes",
+          "onesignal": "Hours",
+          "rollOwn": "Days"
+        },
+        "pricing": {
+          "feature": "Per-project pricing transparency",
+          "nesh": "Free tier in docs",
+          "onesignal": "Sales call",
+          "rollOwn": "Your AWS bill"
+        },
+        "vapid": {
+          "feature": "Web Push standard (VAPID)",
+          "nesh": "Yes",
+          "onesignal": "Yes",
+          "rollOwn": "Yes"
+        },
+        "oss": {
+          "feature": "Open source",
+          "nesh": "MIT",
+          "onesignal": "No",
+          "rollOwn": "Your repo"
+        },
+        "dashboard": {
+          "feature": "Hosted dashboard",
+          "nesh": "Yes",
+          "onesignal": "Yes",
+          "rollOwn": "DIY"
+        },
+        "webhooks": {
+          "feature": "Signed webhooks",
+          "nesh": "Built-in",
+          "onesignal": "Built-in",
+          "rollOwn": "DIY"
+        },
+        "segments": {
+          "feature": "Segmentation / Journeys / A/B",
+          "nesh": "Out of scope",
+          "onesignal": "Yes",
+          "rollOwn": "DIY"
+        }
+      }
+    },
+    "dashboardPreview": {
+      "title": "A dashboard that fits on one screen",
+      "subtitle": "No nested menus to learn. Every project's status at a glance.",
+      "imageAlt": "Nesh dashboard showing a project with subscriber count, monthly sends, and notification history",
+      "callout": {
+        "subs": "Subscriber count & cap",
+        "history": "Send history",
+        "compose": "Send right from the dashboard"
+      }
+    },
+    "howItWorks": {
+      "title": "From signup to first send",
+      "subtitle": "Three steps, one code snippet.",
+      "step1Title": "Create a project",
+      "step1Body": "Sign up and create a project. We generate VAPID keys and an API key for you.",
+      "step2Title": "Drop in the SDK",
+      "step2Body": "Install @piro0919/next-push and pass apiBase + publicKey from the SDK setup screen.",
+      "step3Title": "Send",
+      "step3Body": "Compose in the dashboard, schedule it, or POST to the REST endpoint."
+    },
+    "pricing": {
+      "title": "Free for the entire early access period",
+      "subtitle": "Nesh is a self-funded side project — no VC, no \"surprise paywall\" exit. Long-term pricing will be announced in advance once it's decided.",
+      "badge": "Free during early access",
+      "planName": "Free plan",
+      "price": "$0",
+      "per": "/ month",
+      "items": {
+        "projects": "1 project per account",
+        "subscribers": "5,000 subscribers per project",
+        "sends": "10,000 sends per project per UTC month",
+        "webhooks": "Unlimited webhooks (5s timeout, exponential retry)",
+        "extras": "REST API + signed webhooks included"
+      },
+      "cta": "Pick the free plan"
+    },
+    "faq": {
+      "title": "FAQ",
+      "items": {
+        "free": {
+          "q": "Is it really free?",
+          "a": "Yes, free during early access — within the caps shown above. Long-term pricing isn't decided yet (Nesh is a side project run by one developer, not a VC-backed startup)."
+        },
+        "vsOneSignal": {
+          "q": "Why not just use OneSignal?",
+          "a": "OneSignal is great if you need segmentation, A/B tests, journeys. Nesh is for people who find that overkill and want a tiny dashboard with the essentials — and an open codebase."
+        },
+        "selfHost": {
+          "q": "Can I self-host?",
+          "a": "Yes — the code is MIT and runs on any Postgres + Vercel-compatible host. See the <selfHost>self-hosting guide</selfHost> for the full setup."
+        },
+        "native": {
+          "q": "iOS / Android native?",
+          "a": "Web Push only for now. Web Push works on iOS Safari (16.4+) when installed as a PWA."
+        },
+        "privacy": {
+          "q": "Do you collect data?",
+          "a": "Subscriptions, notification metadata, and shown/clicked counts. No 3rd-party trackers. VAPID private keys are AES-256-GCM encrypted at rest."
+        }
+      }
+    },
+    "finalCta": {
+      "title": "Ship Web Push this afternoon",
+      "subtitle": "No setup call. No credit card. No five-page onboarding.",
+      "ctaPrimary": "Create your account",
+      "ctaSecondary": "See on GitHub"
+    },
+    "footer": {
+      "copy": "© 2026 Nesh · MIT",
+      "docs": "Docs",
+      "signIn": "Sign in",
+      "signUp": "Sign up",
+      "github": "GitHub",
+      "sdk": "SDK"
+    }
+  },
+  "auth": {
+    "layout": {
+      "quote": "\"Web Push, made simple. Sign up, drop the SDK in, and start sending — in minutes.\"",
+      "tagline": "Open source · MIT · Free during early access",
+      "home": "Home",
+      "docs": "Docs",
+      "github": "GitHub"
+    },
+    "common": {
+      "email": "Email",
+      "emailPlaceholder": "you@example.com",
+      "password": "Password",
+      "passwordHint": "8+ characters",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password"
+    },
+    "signIn": {
+      "title": "Welcome back",
+      "subtitle": "Sign in to your Nesh dashboard.",
+      "submit": "Sign in",
+      "submitting": "Signing in…",
+      "altPrompt": "No account?",
+      "altLabel": "Create one"
+    },
+    "signUp": {
+      "title": "Create your account",
+      "subtitle": "Start sending Web Push notifications in minutes.",
+      "submit": "Create account",
+      "submitting": "Creating account…",
+      "altPrompt": "Already have an account?",
+      "altLabel": "Sign in",
+      "disclaimer": "By creating an account you agree the service is provided as-is during early access."
+    },
+    "errors": {
+      "invalidCredentials": "That email and password don't match.",
+      "alreadyRegistered": "That email is already registered. Try signing in.",
+      "rateLimit": "Too many attempts. Try again in a minute."
+    }
+  },
+  "docs": {
+    "meta": {
+      "title": "Docs — Nesh",
+      "description": "REST API, SDK, and webhook reference for Nesh."
+    },
+    "layout": {
+      "home": "Home",
+      "getStarted": "Get started",
+      "copy": "© 2026 Nesh · MIT",
+      "github": "GitHub",
+      "sdk": "SDK"
+    },
+    "nav": {
+      "intro": "Introduction",
+      "quickStart": "Quick start",
+      "sdk": "SDK reference",
+      "restApi": "REST API",
+      "webhooks": "Webhooks",
+      "limits": "Free-tier limits",
+      "selfHost": "Self-hosting"
+    },
+    "index": {
+      "title": "Documentation",
+      "intro": "Everything you need to integrate Nesh: SDK quick start, REST API reference, and webhook signing.",
+      "links": {
+        "quickStart": "Quick start",
+        "sdk": "SDK reference",
+        "restApi": "REST API",
+        "webhooks": "Webhooks",
+        "limits": "Free-tier limits",
+        "selfHost": "Self-hosting"
+      },
+      "desc": {
+        "quickStart": "sign up, install the SDK, send your first notification.",
+        "sdk": "options and return values.",
+        "restApi": "subscribe, unsubscribe, send, track.",
+        "webhooks": "event types, payload shapes, signature verification.",
+        "limits": "caps and rate limits.",
+        "selfHost": "run Nesh on your own Postgres + Vercel-compatible host."
+      }
+    },
+    "quickStart": {
+      "metaTitle": "Quick start — Nesh docs",
+      "title": "Quick start",
+      "step1": "<signUp>Sign up</signUp> at <code></code> and create a project. We generate a VAPID key pair for you and assign a per-project API key.",
+      "step2Lead": "Install the SDK in your Next.js / React app:",
+      "step3Lead": "Drop in the <code></code> hook with the values from your project's \"SDK setup\" card:",
+      "step4Lead": "Add a service worker at <sw></sw>. The default handlers shipped with <pkg></pkg> render notifications and fire shown / click tracking automatically:",
+      "step5": "Send your first notification from the dashboard, or via the REST API."
+    },
+    "sdk": {
+      "metaTitle": "SDK reference — Nesh docs",
+      "title": "SDK reference",
+      "intro": "Returns subscription helpers and reactive state.",
+      "rows": {
+        "apiBase": "Full URL of the project's API base. Use the value shown in the SDK setup card.",
+        "vapidPublicKey": "Project VAPID public key.",
+        "userId": "Optional — your application user id. Lets the dashboard / REST API target sends to specific users.",
+        "swPath": "Defaults to /sw.js.",
+        "swScope": "Override the SW registration scope (e.g. \"/\" when serving from a sub-path)."
+      },
+      "returnedLead": "Returned"
+    },
+    "restApi": {
+      "metaTitle": "REST API — Nesh docs",
+      "title": "REST API",
+      "baseUrlLabel": "Base URL",
+      "subscribe": {
+        "title": "Subscribe",
+        "body": "Called by the SDK after the browser issues a push subscription. CORS-enabled, no auth.",
+        "note": "Rate limited 60 / minute per IP × project × action. The endpoint also enforces the free-tier subscriber cap on new endpoints (existing endpoints can always update)."
+      },
+      "unsubscribe": { "title": "Unsubscribe" },
+      "send": {
+        "title": "Send notification",
+        "body": "Server-to-server. Use the <bearer></bearer> token from the project's API key card (format <key></key>). Synchronous — the response includes delivery counts.",
+        "note": "Subject to the monthly send cap (10,000 / project / UTC month on the free tier). Returns <code></code> when reached."
+      },
+      "track": {
+        "title": "Track event (SDK / SW)",
+        "body": "Service Workers POST shown / clicked beacons here automatically when the SDK is v0.6+. You shouldn't normally call this from your code."
+      }
+    },
+    "webhooks": {
+      "metaTitle": "Webhooks — Nesh docs",
+      "title": "Webhooks",
+      "intro1": "Configure one or more webhook URLs on the project page. Every enabled webhook receives a JSON <post></post> signed with <hmac></hmac> for each event. Failed deliveries (5xx / 408 / 429 / network errors) are retried with exponential backoff (30s → 2m → 10m → 1h, 5 attempts max). The <attempt></attempt> header counts the attempt number when retried.",
+      "intro2": "Each webhook can be filtered to a subset of event types from the project page. The default (all checkboxes selected) subscribes the webhook to every event.",
+      "events": {
+        "title": "Events",
+        "notificationSent": "After a notification finishes sending (dashboard / REST / cron).",
+        "subscriptionCreated": "A brand-new endpoint subscribed (re-subscribes do not refire).",
+        "subscriptionRemoved": "A subscription was removed — by the client (DELETE) or because the push service returned 404/410."
+      },
+      "removedReason": "<client></client> means the SDK / dashboard called DELETE; <expired></expired> means the push service returned 404/410 during a send and Nesh dropped the dead subscription automatically.",
+      "verify": {
+        "title": "Verifying the signature (Node.js)",
+        "note": "Always compare bodies as raw bytes (read the request body before parsing JSON). Webhook delivery has a 5-second timeout; non-2xx responses are recorded as the last delivery error and shown on the dashboard."
+      }
+    },
+    "limits": {
+      "metaTitle": "Free-tier limits — Nesh docs",
+      "title": "Free-tier limits",
+      "rows": {
+        "projects": "Projects per user",
+        "subscribers": "Subscribers per project",
+        "sends": "Sends per project per UTC month",
+        "webhookTimeout": "Webhook delivery timeout",
+        "subRate": "Subscribe / unsubscribe rate limit",
+        "eventRate": "Event tracking rate limit"
+      },
+      "note": "Hard caps return <c403></c403> (subscribers) or <c429></c429> (sends). <faq>More on the FAQ</faq>."
+    },
+    "selfHost": {
+      "metaTitle": "Self-hosting — Nesh docs",
+      "title": "Self-hosting",
+      "intro": "Nesh is MIT-licensed and runs on any Node-compatible host with a Postgres database. The reference deploy targets Vercel + Supabase, but neither is required.",
+      "reqs": {
+        "title": "Requirements",
+        "node": "Node.js 20+ (the Vercel build image works as-is).",
+        "pg": "Postgres 15+ — Supabase, Neon, RDS, or self-hosted all work.",
+        "host": "Any Node-compatible host that runs the Next.js build output (Vercel, Cloudflare, Fly.io, a VM, Docker).",
+        "https": "HTTPS on the production origin — browsers refuse to register Service Workers over plain HTTP."
+      },
+      "step1": {
+        "title": "1. Clone and install",
+        "body": "Clone the repository and install dependencies."
+      },
+      "step2": {
+        "title": "2. Provision Postgres + apply migrations",
+        "bodyLead": "All schema is in <code></code>. If you're using Supabase, the project ships with the CLI — start the local stack with",
+        "bodyCli": "and apply the same migrations to your remote project. For non-Supabase Postgres, run the SQL files in <code></code> in filename order.",
+        "rls": "Row-Level Security is enabled on every table. The dashboard talks to Postgres as the signed-in user via Supabase auth; server routes that bypass RLS (cron, REST send) use the service role key."
+      },
+      "step3": {
+        "title": "3. Environment variables",
+        "body": "Copy <code></code> to <code></code> and fill in:"
+      },
+      "env": {
+        "supabaseUrl": "Postgres URL exposed by Supabase (or any PostgREST endpoint).",
+        "supabaseAnon": "Anonymous (publishable) key — safe to expose to the browser.",
+        "supabaseService": "Service-role key — server-only, bypasses RLS. Treat like a database password.",
+        "siteUrl": "Public origin of your Nesh deployment. Used to build the apiBase shown to SDK users and the public event tracking URL.",
+        "cronSecret": "Shared secret the cron job uses to authenticate. Any sufficiently random string.",
+        "vapidKeyEnc": "32-byte AES-256-GCM key for encrypting per-project VAPID private keys at rest. Generate with the command below — losing this key means losing access to every existing project's VAPID identity.",
+        "adminUserIds": "Optional. Comma-separated list of Supabase user UUIDs that can access the /admin dashboard."
+      },
+      "step4": {
+        "title": "4. Deploy",
+        "vercelLead": "Vercel: connect the repo, set the env vars from step 3, and deploy. The included <code></code> wires up the cron schedule automatically.",
+        "selfLead": "Self-hosted: build and run with",
+        "noteCron": "On non-Vercel hosts you'll need to schedule <code></code> yourself — see step 5."
+      },
+      "step5": {
+        "title": "5. Schedule the cron worker",
+        "body": "The cron worker dispatches scheduled notifications, retries failed webhook deliveries, and prunes rate-limit rows. It should run roughly every minute. Authenticate it with the <code></code> as a Bearer token.",
+        "vercel": "On Vercel: the bundled <code></code> already declares this schedule.",
+        "manual": "Outside Vercel: any scheduler will do — GitHub Actions, fly.io machines, cron + curl, Kubernetes CronJob. Example crontab:"
+      },
+      "step6": {
+        "title": "6. First user and admin",
+        "body": "Sign up via the UI to create your account. Look up your user UUID in Supabase Studio (or via SQL) and add it to <code></code> to unlock the /admin dashboard."
+      },
+      "notes": {
+        "title": "Operational notes",
+        "encKey": "<code></code> must not change after projects exist. Back it up alongside your database. Rotation requires re-encrypting every projects.vapid_private_key.",
+        "scaling": "Web Push fan-out runs serially per project inside the send route (max ~5000 subs per project on the bundled tier). If you raise that ceiling, consider moving the fan-out to a queue.",
+        "tracking": "Event tracking (shown / clicked) hits a public endpoint by design — beacons send no credentials. Rate limited per IP.",
+        "logs": "Server errors are persisted to <code></code> and surfaced on /admin. Useful when debugging a deploy."
+      }
+    }
+  },
+  "dashboard": {
+    "sidebar": {
+      "projects": "Projects",
+      "account": "Account",
+      "admin": "Admin",
+      "docs": "Docs",
+      "signOut": "Sign out"
+    },
+    "projectNav": {
+      "overview": "Overview",
+      "notifications": "Notifications",
+      "subscribers": "Subscribers",
+      "webhooks": "Webhooks",
+      "analytics": "Analytics",
+      "sdk": "SDK setup",
+      "api": "REST API",
+      "export": "Export",
+      "settings": "Settings"
+    },
+    "projectsList": {
+      "title": "Projects",
+      "new": "New project",
+      "empty": "No projects yet",
+      "emptyDesc": "Create a project to get a VAPID key pair and start collecting subscribers.",
+      "createdAt": "Created {date}",
+      "subscribers": "{count, plural, one {# subscriber} other {# subscribers}}"
+    },
+    "newProject": {
+      "title": "New project",
+      "name": "Name",
+      "create": "Create",
+      "creating": "Creating..."
+    },
+    "account": {
+      "title": "Account",
+      "profile": "Profile",
+      "email": "Email",
+      "userId": "User ID",
+      "changePassword": "Change password",
+      "dangerZone": "Danger zone"
+    },
+    "changePassword": {
+      "newPassword": "New password",
+      "placeholder": "At least 8 characters",
+      "saving": "Saving...",
+      "update": "Update password"
+    },
+    "deleteAccount": {
+      "open": "Delete account…",
+      "warning": "This will permanently delete <email></email>, every project you own, and every subscriber attached to those projects. This cannot be undone.",
+      "typeToConfirm": "Type <phrase></phrase> to confirm",
+      "deleting": "Deleting…",
+      "confirmDelete": "Delete account permanently",
+      "cancel": "Cancel"
+    },
+    "admin": {
+      "title": "Admin · usage",
+      "stat": {
+        "users": "Users (with projects)",
+        "projects": "Projects",
+        "subscribers": "Subscribers",
+        "notificationsAllTime": "Notifications (all-time)",
+        "notificationsThisMonth": "Notifications (this month UTC)"
+      },
+      "breakdown": {
+        "title": "Per-project breakdown",
+        "project": "Project",
+        "subs": "Subs",
+        "sendsMo": "Sends (mo.)",
+        "shown": "Shown",
+        "clicked": "Clicked",
+        "ctr": "CTR",
+        "created": "Created",
+        "empty": "No projects."
+      },
+      "errors": { "title": "Recent errors (cross-project)", "empty": "No errors logged." }
+    },
+    "projectOverview": {
+      "createdAt": "Created {date}",
+      "send": "Send notification",
+      "stat": {
+        "subscribers": "Subscribers",
+        "sendsThisMonth": "Sends this month",
+        "totalShown": "Total shown",
+        "ctr": "Click-through rate",
+        "clicks": "{count, plural, one {# click} other {# clicks}}"
+      },
+      "recent": {
+        "title": "Recent notifications",
+        "viewAll": "View all →",
+        "empty": "No notifications sent yet.",
+        "shownClicked": "{shown} shown · {clicked} clicked"
+      }
+    },
+    "notificationsPage": { "title": "Notifications", "send": "Send notification" },
+    "subscribersPage": {
+      "heading": "{name} · subscribers",
+      "total": "{count} total",
+      "back": "← Back to project",
+      "search": "Search",
+      "searchPlaceholder": "Match user ID or endpoint…",
+      "searchButton": "Search",
+      "clear": "Clear",
+      "anonymous": "(anonymous)",
+      "noMatches": "No subscribers match that search",
+      "noMatchesDesc": "Try a different user ID or part of an endpoint.",
+      "empty": "No subscribers yet",
+      "emptyDesc": "Wire up the SDK in your app — subscribers appear here as soon as users grant push permission.",
+      "emptyCta": "Open quick-start",
+      "page": "Page {page} of {lastPage}",
+      "prev": "← Prev",
+      "next": "Next →"
+    },
+    "webhooksPage": { "title": "Webhooks" },
+    "analyticsPage": {
+      "title": "Analytics",
+      "errors": "Recent errors",
+      "noErrors": "No errors logged."
+    },
+    "sdkPage": { "title": "SDK setup" },
+    "apiPage": { "title": "REST API" },
+    "exportPage": { "title": "Export" },
+    "settingsPage": {
+      "title": "Settings",
+      "info": "Project info",
+      "name": "Name",
+      "id": "ID",
+      "vapidSubject": "VAPID subject",
+      "created": "Created",
+      "dangerZone": "Danger zone",
+      "dangerDesc": "Permanently delete this project, its subscribers, and all notification history."
+    },
+    "copy": {
+      "copy": "Copy",
+      "copied": "Copied",
+      "copiedLabel": "{label} copied",
+      "failed": "Failed to copy"
+    },
+    "exportCard": {
+      "title": "Export",
+      "desc": "No lock-in: download your data as CSV at any time.",
+      "subscribers": "Subscribers CSV",
+      "notifications": "Notifications CSV"
+    },
+    "deleteProject": {
+      "confirm": "Delete \"{name}\"? This cannot be undone.",
+      "delete": "Delete",
+      "deleting": "Deleting...",
+      "failed": "Failed to delete"
+    },
+    "deleteNotification": {
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "confirmCancel": "Cancel this scheduled notification?",
+      "confirmDelete": "Delete this notification from history?",
+      "failed": "Failed"
+    },
+    "projectName": {
+      "rename": "Rename",
+      "saving": "Saving…",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "sdkSetup": {
+      "title": "SDK setup",
+      "fullRef": "Full reference at <link>/docs</link>.",
+      "example": "Example",
+      "snippet": "Snippet"
+    },
+    "apiKey": {
+      "title": "REST API",
+      "apiKey": "API key",
+      "show": "Show",
+      "hide": "Hide",
+      "regenerate": "Regenerate",
+      "regenerateConfirm": "Regenerate API key? Any clients using the current key will stop working immediately.",
+      "regenerated": "API key regenerated",
+      "regenerateFailed": "Failed to regenerate",
+      "sendViaCurl": "Send via curl",
+      "snippet": "Snippet"
+    },
+    "defaults": {
+      "title": "Notification defaults",
+      "desc": "Used when a notification is sent without specifying its own icon / badge. Leave blank to use the OS default.",
+      "defaultIcon": "Default icon URL",
+      "defaultBadge": "Default badge URL",
+      "saved": "Saved.",
+      "saving": "Saving...",
+      "save": "Save defaults"
+    },
+    "notificationsList": {
+      "title": "History",
+      "empty": "No notifications yet",
+      "emptyDesc": "Send your first push from this dashboard or via the REST API — delivery stats land here.",
+      "emptyCta": "Send notification",
+      "status": { "sent": "sent", "scheduled": "scheduled", "pending": "pending" },
+      "scheduledFor": "Scheduled for {date}",
+      "sentAt": "Sent {date}",
+      "targeted": "{count, plural, one {Targeted: # user} other {Targeted: # users}}",
+      "stats": "{delivered} delivered · {shown} shown · {clicked} clicked",
+      "removed": "{count} removed",
+      "failed": "{count} failed",
+      "resend": "Resend"
+    },
+    "analyticsChart": {
+      "title": "Last {days} days",
+      "notifications": "Notifications",
+      "delivered": "Delivered",
+      "shown": "Shown",
+      "clicked": "Clicked",
+      "ofDelivered": "{rate}% of delivered",
+      "ofShown": "{rate}% of shown",
+      "tooltip": "{date} — {sent} sent · {delivered} delivered · {shown} shown · {clicked} clicked",
+      "legend": "Daily delivered (hover for detail)"
+    },
+    "webhookCard": {
+      "title": "Webhooks",
+      "intro": "Each enabled webhook receives a signed <post></post> after every successful send. Verify with <sig></sig> (<hmac></hmac>). See <docs>/docs</docs>.",
+      "empty": "No webhooks yet.",
+      "events": "Events",
+      "eventsHint": "Leave all checked to receive every event type.",
+      "add": "Add webhook",
+      "newWebhook": "New webhook",
+      "endpointUrl": "Endpoint URL",
+      "nameOpt": "Name (optional)",
+      "creating": "Creating…",
+      "create": "Create",
+      "cancel": "Cancel",
+      "urlLabel": "URL",
+      "nameLabel": "Name",
+      "enabled": "Enabled",
+      "saving": "Saving…",
+      "save": "Save",
+      "sending": "Sending…",
+      "sendTest": "Send test",
+      "deleting": "Deleting…",
+      "delete": "Delete",
+      "deleteConfirm": "Delete this webhook?",
+      "signingSecret": "Signing secret",
+      "show": "Show",
+      "hide": "Hide",
+      "secret": "Secret",
+      "rotating": "Rotating…",
+      "rotate": "Rotate",
+      "rotateConfirm": "Rotate the signing secret? Existing receivers will break until updated.",
+      "noDeliveriesYet": "No deliveries yet.",
+      "lastDelivery": "Last delivery {date}",
+      "networkError": "network error",
+      "noLogged": "No deliveries logged yet.",
+      "hideDeliveries": "Hide deliveries",
+      "recentDeliveries": "Recent deliveries ({count})",
+      "attempt": "attempt {n}",
+      "retryAt": "retry at {time}",
+      "netErr": "net err"
+    },
+    "deleteSubscription": {
+      "confirm": "Remove this subscription? The browser will stop receiving notifications.",
+      "removing": "Removing…",
+      "remove": "Remove"
+    },
+    "newNotification": {
+      "title": "New notification",
+      "titleField": "Title",
+      "body": "Body",
+      "url": "URL (optional)",
+      "visuals": "Visuals (optional)",
+      "iconUrl": "Icon URL",
+      "iconHint": "Small icon shown alongside the notification (192×192 PNG recommended).",
+      "imageUrl": "Image URL",
+      "imageHint": "Large image rendered in the body (Android & some desktop browsers).",
+      "badgeUrl": "Badge URL",
+      "badgeHint": "Monochrome icon shown in the system tray (Android only).",
+      "send": "Send",
+      "immediately": "Immediately",
+      "atSpecificTime": "At a specific time",
+      "targetUserIds": "Target user IDs (optional)",
+      "targetPlaceholder": "Leave empty to broadcast. Otherwise comma- or newline-separated.",
+      "targetHint": "Matches subscriptions whose <code></code> (set via the SDK) is in this list. Empty = send to all.",
+      "scheduledAt": "Scheduled at (local time)",
+      "sending": "Sending...",
+      "sendNow": "Send now",
+      "schedule": "Schedule"
+    },
+    "notificationPreview": {
+      "placeholderTitle": "Notification title",
+      "placeholderBody": "Notification body will appear here.",
+      "livePreview": "Live preview",
+      "now": "now",
+      "disclaimer": "Approximate desktop rendering. Actual appearance depends on browser and OS."
+    },
+    "deliveryDetail": {
+      "title": "Delivery detail",
+      "back": "← Back to project",
+      "summary": "Summary",
+      "event": "Event",
+      "status": "Status",
+      "networkError": "network error",
+      "attempts": "Attempts",
+      "nextRetry": "Next retry",
+      "url": "URL",
+      "request": "Request",
+      "response": "Response",
+      "noBody": "(no response body)"
+    }
+  }
+}

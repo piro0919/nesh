@@ -1,11 +1,15 @@
-import { redirect } from "next/navigation";
+import { getLocale } from "next-intl/server";
+import { redirect } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 
 export async function getCurrentUser() {
   const supabase = await createClient();
   const { data, error } = await supabase.auth.getUser();
-  if (error || !data.user) {
-    redirect("/sign-in");
+  const user = data.user;
+  if (error || !user) {
+    redirect({ href: "/sign-in", locale: await getLocale() });
+    // unreachable — redirect throws, but TS doesn't always infer `never` from next-intl
+    throw new Error("unreachable");
   }
-  return data.user;
+  return user;
 }

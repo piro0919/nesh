@@ -1,0 +1,722 @@
+{
+  "metadata": {
+    "title": "Nesh — シンプルな Web Push 通知サービス",
+    "description": "Next.js / React 向けの軽量な Web Push SaaS。OneSignal の代替として、サインアップして SDK を組み込むだけで送信を開始できます。"
+  },
+  "common": {
+    "language": "言語",
+    "toggleTheme": "テーマを切り替え",
+    "signIn": "ログイン",
+    "signUp": "新規登録",
+    "getStarted": "はじめる",
+    "docs": "ドキュメント",
+    "github": "GitHub"
+  },
+  "landing": {
+    "nav": {
+      "docs": "ドキュメント",
+      "github": "GitHub",
+      "signIn": "ログイン",
+      "getStarted": "はじめる"
+    },
+    "hero": {
+      "badge": "オープンソース · アーリーアクセス中は無料",
+      "titleLine1": "Web Push 通知を、",
+      "titleLine2": "シンプルに。",
+      "subtitle": "Next.js / React 向けのオープンソース Web Push。SDK を入れるだけで、数分後には自分のサービスから通知を送れます。",
+      "ctaPrimary": "無料ではじめる",
+      "ctaSecondary": "ドキュメントを読む",
+      "ctaFooter": "クレジットカード不要 · MIT ライセンス · セルフホスト可",
+      "imageAlt": "ブラウザ右上から Nesh のプッシュ通知がスライドインしている様子",
+      "samples": [
+        { "title": "Web Push、届きました", "body": "2 分前に送信した通知が配信されました。" },
+        { "title": "毎日のサマリー", "body": "昨日: 配信 1,247 件 · 表示 832 · クリック 198" },
+        { "title": "新しいフォロワー", "body": "@alice があなたをフォローしました。" },
+        { "title": "Webhook 署名済み", "body": "notification.sent を X-Nesh-Signature 付きで送出" },
+        { "title": "購読者マイルストーン", "body": "プロジェクト demo の購読者が 5,000 人を突破" }
+      ]
+    },
+    "trust": {
+      "item1": "Next.js 16 ベース",
+      "item2": "Supabase の Postgres + RLS",
+      "item3": "VAPID + Web Push 標準",
+      "item4": "HMAC 署名付き Webhook"
+    },
+    "features": {
+      "title": "通知を送るための、必要十分な機能",
+      "subtitle": "セグメント分析もジャーニーも A/B もありません。通知を、ちゃんと送る。やるのはそれだけです。",
+      "items": {
+        "send": {
+          "title": "数秒で送信",
+          "body": "ダッシュボードから作るか、Bearer トークン付きで API に POST するだけ。レスポンスに配信件数が返ります。"
+        },
+        "rest": {
+          "title": "REST API",
+          "body": "プロジェクトごとに 1 エンドポイント。バックエンド、CI、curl、どこからでも叩けます。サーバー側 SDK は不要。"
+        },
+        "userIds": {
+          "title": "外部ユーザー ID",
+          "body": "購読にアプリ側のユーザー ID を紐付ければ、ダッシュボードや REST から特定ユーザー宛に送れます。"
+        },
+        "webhooks": {
+          "title": "署名付き Webhook",
+          "body": "HMAC-SHA256 で署名、指数バックオフでリトライ、イベント単位でフィルタ。配信ログとリプレイ UI も。"
+        },
+        "analytics": {
+          "title": "計測まで標準装備",
+          "body": "表示・クリックのビーコンを SDK の Service Worker が自動で送信。別ツールの導入は不要です。"
+        },
+        "openSource": {
+          "title": "オープンソース",
+          "body": "全コード MIT。読める、フォークできる、ストレージも自分の目で監査できる。セルフホスト手順も同梱しています。"
+        }
+      }
+    },
+    "comparison": {
+      "title": "Web Push 特化、それ以外はやらない",
+      "subtitle": "マーケ向けの大型機能は載せていません。代わりに、コードを読めて、データを自分の DB に置けて、ベンダーロックインもありません。",
+      "colFeature": "機能",
+      "colNesh": "Nesh",
+      "colOneSignal": "OneSignal",
+      "colRollOwn": "自作",
+      "rows": {
+        "time": {
+          "feature": "最初の通知を送るまで",
+          "nesh": "数分",
+          "onesignal": "数時間",
+          "rollOwn": "数日"
+        },
+        "pricing": {
+          "feature": "料金の透明性",
+          "nesh": "無料枠を明記",
+          "onesignal": "営業に要問い合わせ",
+          "rollOwn": "AWS の請求書次第"
+        },
+        "vapid": {
+          "feature": "Web Push 標準 (VAPID)",
+          "nesh": "対応",
+          "onesignal": "対応",
+          "rollOwn": "対応"
+        },
+        "oss": {
+          "feature": "オープンソース",
+          "nesh": "MIT",
+          "onesignal": "非公開",
+          "rollOwn": "自前のリポジトリ"
+        },
+        "dashboard": {
+          "feature": "ホスト型ダッシュボード",
+          "nesh": "あり",
+          "onesignal": "あり",
+          "rollOwn": "自作"
+        },
+        "webhooks": {
+          "feature": "署名付き Webhook",
+          "nesh": "標準搭載",
+          "onesignal": "標準搭載",
+          "rollOwn": "自作"
+        },
+        "segments": {
+          "feature": "セグメント / ジャーニー / A/B",
+          "nesh": "対象外",
+          "onesignal": "あり",
+          "rollOwn": "自作"
+        }
+      }
+    },
+    "dashboardPreview": {
+      "title": "1 画面で完結するダッシュボード",
+      "subtitle": "深い階層メニューはありません。プロジェクトの状況がひと目でわかります。",
+      "imageAlt": "購読者数、月間送信数、通知履歴を表示する Nesh ダッシュボード",
+      "callout": {
+        "subs": "購読者数と上限",
+        "history": "通知の送信履歴",
+        "compose": "ダッシュボードから直接送信"
+      }
+    },
+    "howItWorks": {
+      "title": "登録から初回送信まで",
+      "subtitle": "ステップは 3 つ、コードはこれだけ。",
+      "step1Title": "プロジェクトを作る",
+      "step1Body": "サインアップしてプロジェクトを作成。VAPID キーと API キーは自動で発行されます。",
+      "step2Title": "SDK を組み込む",
+      "step2Body": "@piro0919/next-push をインストールして、設定画面に表示される apiBase と publicKey を渡すだけ。",
+      "step3Title": "送る",
+      "step3Body": "ダッシュボードから作成・予約するか、REST エンドポイントへ POST。"
+    },
+    "pricing": {
+      "title": "アーリーアクセス中はずっと無料",
+      "subtitle": "Nesh は外部資金を入れていない個人開発のサイドプロジェクトです。「突然有料化して逃げる」ようなことはしません — 正式料金が決まったら事前にお知らせします。",
+      "badge": "アーリーアクセス中・無料",
+      "planName": "Free プラン",
+      "price": "¥0",
+      "per": "/ 月",
+      "items": {
+        "projects": "1 アカウントにつき 1 プロジェクト",
+        "subscribers": "1 プロジェクトあたり 5,000 購読者",
+        "sends": "1 プロジェクトあたり月 10,000 通 (UTC 基準)",
+        "webhooks": "Webhook 数は無制限 (タイムアウト 5 秒・指数リトライ)",
+        "extras": "REST API と署名付き Webhook を標準で利用可能"
+      },
+      "cta": "この内容で始める"
+    },
+    "faq": {
+      "title": "よくある質問",
+      "items": {
+        "free": {
+          "q": "本当に無料ですか?",
+          "a": "はい。アーリーアクセス中は上記の上限内で完全に無料です。正式な料金体系は検討中です (Nesh は外部資金を入れておらず、個人開発者のサイドプロジェクトとして運営しています)。"
+        },
+        "vsOneSignal": {
+          "q": "OneSignal ではダメですか?",
+          "a": "セグメント・A/B・ジャーニーが必要なら OneSignal の方が向いています。Nesh は「そこまでは要らない」という人向けに、最小限の機能とオープンなコードだけを提供します。"
+        },
+        "selfHost": {
+          "q": "セルフホストできますか?",
+          "a": "はい。MIT ライセンスで、Postgres と Vercel 互換のホストがあれば動きます。詳細は <selfHost>セルフホストガイド</selfHost>を参照してください。"
+        },
+        "native": {
+          "q": "iOS / Android のネイティブアプリには対応していますか?",
+          "a": "現時点では Web Push のみ対応しています。iOS Safari (16.4 以降) でも、PWA としてインストールすれば動作します。"
+        },
+        "privacy": {
+          "q": "どんなデータを取得していますか?",
+          "a": "購読情報、通知のメタデータ、表示・クリック数だけです。サードパーティのトラッカーは入れていません。VAPID 秘密鍵は AES-256-GCM で暗号化して保存しています。"
+        }
+      }
+    },
+    "finalCta": {
+      "title": "今日中に Web Push を本番投入",
+      "subtitle": "営業との打ち合わせなし、クレジットカード不要、長いオンボーディングもなし。",
+      "ctaPrimary": "アカウントを作成",
+      "ctaSecondary": "GitHub を見る"
+    },
+    "footer": {
+      "copy": "© 2026 Nesh · MIT",
+      "docs": "ドキュメント",
+      "signIn": "ログイン",
+      "signUp": "新規登録",
+      "github": "GitHub",
+      "sdk": "SDK"
+    }
+  },
+  "auth": {
+    "layout": {
+      "quote": "「Web Push を、シンプルに。SDK を入れるだけで数分後には送れる。」",
+      "tagline": "オープンソース · MIT · アーリーアクセス中は無料",
+      "home": "ホーム",
+      "docs": "ドキュメント",
+      "github": "GitHub"
+    },
+    "common": {
+      "email": "メールアドレス",
+      "emailPlaceholder": "you@example.com",
+      "password": "パスワード",
+      "passwordHint": "8 文字以上",
+      "showPassword": "パスワードを表示",
+      "hidePassword": "パスワードを隠す"
+    },
+    "signIn": {
+      "title": "おかえりなさい",
+      "subtitle": "Nesh のダッシュボードにログインします。",
+      "submit": "ログイン",
+      "submitting": "ログイン中…",
+      "altPrompt": "アカウントをお持ちでない?",
+      "altLabel": "新規作成"
+    },
+    "signUp": {
+      "title": "アカウントを作成",
+      "subtitle": "数分で Web Push 通知の送信をはじめましょう。",
+      "submit": "アカウントを作成",
+      "submitting": "作成中…",
+      "altPrompt": "すでにアカウントをお持ち?",
+      "altLabel": "ログイン",
+      "disclaimer": "アカウントを作成すると、アーリーアクセス期間中はサービスが現状の内容で提供されることに同意したものとみなします。"
+    },
+    "errors": {
+      "invalidCredentials": "メールアドレスとパスワードが一致しません。",
+      "alreadyRegistered": "このメールアドレスは既に登録済みです。ログインをお試しください。",
+      "rateLimit": "試行回数が多すぎます。1 分後に再試行してください。"
+    }
+  },
+  "docs": {
+    "meta": {
+      "title": "ドキュメント — Nesh",
+      "description": "Nesh の REST API / SDK / Webhook リファレンス。"
+    },
+    "layout": {
+      "home": "ホーム",
+      "getStarted": "はじめる",
+      "copy": "© 2026 Nesh · MIT",
+      "github": "GitHub",
+      "sdk": "SDK"
+    },
+    "nav": {
+      "intro": "はじめに",
+      "quickStart": "クイックスタート",
+      "sdk": "SDK リファレンス",
+      "restApi": "REST API",
+      "webhooks": "Webhook",
+      "limits": "無料枠の上限",
+      "selfHost": "セルフホスト"
+    },
+    "index": {
+      "title": "ドキュメント",
+      "intro": "Nesh を統合するために必要なすべて: SDK クイックスタート、REST API リファレンス、Webhook 署名検証。",
+      "links": {
+        "quickStart": "クイックスタート",
+        "sdk": "SDK リファレンス",
+        "restApi": "REST API",
+        "webhooks": "Webhook",
+        "limits": "無料枠の上限",
+        "selfHost": "セルフホスト"
+      },
+      "desc": {
+        "quickStart": "サインアップ、SDK インストール、初回の通知送信まで。",
+        "sdk": "のオプションと戻り値。",
+        "restApi": "subscribe / unsubscribe / 送信 / イベント追跡。",
+        "webhooks": "イベント種別、ペイロード形式、署名検証。",
+        "limits": "上限とレート制限。",
+        "selfHost": "自前の Postgres + Vercel 互換ホストで Nesh を運用する。"
+      }
+    },
+    "quickStart": {
+      "metaTitle": "クイックスタート — Nesh ドキュメント",
+      "title": "クイックスタート",
+      "step1": "<code></code> から <signUp>サインアップ</signUp> してプロジェクトを作成します。VAPID 鍵ペアとプロジェクト固有の API キーが自動で発行されます。",
+      "step2Lead": "Next.js / React アプリに SDK をインストール:",
+      "step3Lead": "プロジェクトの「SDK setup」カードに表示される値を使って <code></code> フックを組み込みます:",
+      "step4Lead": "<sw></sw> に Service Worker を追加します。<pkg></pkg> に同梱のデフォルトハンドラが通知表示と shown / click トラッキングを自動で処理します:",
+      "step5": "ダッシュボードから、または REST API 経由で最初の通知を送信。"
+    },
+    "sdk": {
+      "metaTitle": "SDK リファレンス — Nesh ドキュメント",
+      "title": "SDK リファレンス",
+      "intro": "購読のヘルパーとリアクティブな状態を返します。",
+      "rows": {
+        "apiBase": "プロジェクトの API ベース URL。SDK setup カードに表示される値を使用。",
+        "vapidPublicKey": "プロジェクトの VAPID 公開鍵。",
+        "userId": "任意 — アプリ側のユーザー ID。ダッシュボード / REST API で特定ユーザー宛てに送信できます。",
+        "swPath": "デフォルトは /sw.js。",
+        "swScope": "SW 登録スコープを上書き (例: サブパス配信時の \"/\")。"
+      },
+      "returnedLead": "戻り値"
+    },
+    "restApi": {
+      "metaTitle": "REST API — Nesh ドキュメント",
+      "title": "REST API",
+      "baseUrlLabel": "ベース URL",
+      "subscribe": {
+        "title": "Subscribe",
+        "body": "ブラウザが push subscription を発行した後、SDK から呼ばれます。CORS 対応、認証なし。",
+        "note": "1 IP × プロジェクト × アクションあたり 60 リクエスト/分のレート制限。新規エンドポイントには無料枠の購読者数上限も適用されます (既存エンドポイントの更新は常に可能)。"
+      },
+      "unsubscribe": { "title": "Unsubscribe" },
+      "send": {
+        "title": "通知を送信",
+        "body": "サーバー間通信。プロジェクトの API キーカードの <bearer></bearer> トークン (形式: <key></key>) を使用。同期 — レスポンスに配信件数が含まれます。",
+        "note": "無料枠では月間送信上限 (プロジェクトあたり 10,000 通 / UTC 月) が適用されます。超過時は <code></code> を返します。"
+      },
+      "track": {
+        "title": "イベント追跡 (SDK / SW)",
+        "body": "SDK v0.6+ では Service Worker が shown / clicked ビーコンを自動で POST します。通常はコードから呼ぶ必要はありません。"
+      }
+    },
+    "webhooks": {
+      "metaTitle": "Webhook — Nesh ドキュメント",
+      "title": "Webhook",
+      "intro1": "プロジェクトページで 1 つ以上の Webhook URL を設定します。有効な Webhook は、各イベントごとに <hmac></hmac> で署名された JSON を <post></post> で受け取ります。配信失敗 (5xx / 408 / 429 / ネットワークエラー) は指数バックオフで再試行 (30 秒 → 2 分 → 10 分 → 1 時間、最大 5 回)。再試行時は <attempt></attempt> ヘッダに試行回数が入ります。",
+      "intro2": "各 Webhook はイベント種別の一部だけにフィルタできます。デフォルト (全チェックボックス選択) は全イベントを受信します。",
+      "events": {
+        "title": "イベント",
+        "notificationSent": "通知の送信完了後 (ダッシュボード / REST / cron)。",
+        "subscriptionCreated": "新規エンドポイントの購読 (再購読は発火しません)。",
+        "subscriptionRemoved": "購読が削除された — クライアントの DELETE か、push サービスが 404/410 を返した場合。"
+      },
+      "removedReason": "<client></client> は SDK / ダッシュボードからの DELETE、<expired></expired> は送信時に push サービスが 404/410 を返し、Nesh が失効した購読を自動で削除したことを示します。",
+      "verify": {
+        "title": "署名を検証する (Node.js)",
+        "note": "本文は生バイトで比較してください (JSON パースの前にリクエストボディを読む)。Webhook 配信は 5 秒タイムアウト、非 2xx レスポンスは最終配信エラーとして記録されダッシュボードに表示されます。"
+      }
+    },
+    "limits": {
+      "metaTitle": "無料枠の上限 — Nesh ドキュメント",
+      "title": "無料枠の上限",
+      "rows": {
+        "projects": "ユーザーあたりプロジェクト数",
+        "subscribers": "プロジェクトあたり購読者数",
+        "sends": "プロジェクトあたり月間送信数 (UTC)",
+        "webhookTimeout": "Webhook 配信タイムアウト",
+        "subRate": "Subscribe / unsubscribe レート制限",
+        "eventRate": "イベント追跡レート制限"
+      },
+      "note": "上限超過時は <c403></c403> (購読者) または <c429></c429> (送信) を返します。<faq>詳細は FAQ へ</faq>。"
+    },
+    "selfHost": {
+      "metaTitle": "セルフホスト — Nesh ドキュメント",
+      "title": "セルフホスト",
+      "intro": "Nesh は MIT ライセンスで、Node.js が動く環境と Postgres が用意できれば自前でホストできます。リファレンス構成は Vercel + Supabase ですが、どちらも必須ではありません。",
+      "reqs": {
+        "title": "前提条件",
+        "node": "Node.js 20 以降 (Vercel のビルドイメージそのままで動きます)。",
+        "pg": "Postgres 15 以降 — Supabase、Neon、RDS、自前運用、いずれも可。",
+        "host": "Next.js のビルド成果物が動くホストならどこでも (Vercel、Cloudflare、Fly.io、VM、Docker など)。",
+        "https": "本番オリジンは HTTPS 必須 — ブラウザは平文 HTTP では Service Worker を登録しません。"
+      },
+      "step1": {
+        "title": "1. クローンとインストール",
+        "body": "リポジトリをクローンして依存関係をインストール:"
+      },
+      "step2": {
+        "title": "2. Postgres を用意してマイグレーションを適用",
+        "bodyLead": "スキーマはすべて <code></code> にあります。Supabase を使う場合は、リポジトリ同梱の CLI でローカルスタックを起動:",
+        "bodyCli": "リモートプロジェクトにも同じマイグレーションを適用してください。Supabase 以外の Postgres を使う場合は <code></code> 配下の SQL ファイルを名前順に流し込みます。",
+        "rls": "全テーブルで Row-Level Security 有効。ダッシュボードからの DB アクセスは Supabase 認証されたユーザーとして、cron や REST 送信などの内部ルートだけが service role キーで RLS をバイパスします。"
+      },
+      "step3": {
+        "title": "3. 環境変数",
+        "body": "<code></code> を <code></code> にコピーして以下を埋めます:"
+      },
+      "env": {
+        "supabaseUrl": "Supabase が公開する Postgres URL (または任意の PostgREST エンドポイント)。",
+        "supabaseAnon": "Anonymous (公開) キー — ブラウザに渡しても安全。",
+        "supabaseService": "Service-role キー — サーバー専用、RLS をバイパスします。DB パスワードと同等に扱ってください。",
+        "siteUrl": "Nesh デプロイの公開オリジン。SDK ユーザーに見せる apiBase と公開イベント追跡 URL の生成に使われます。",
+        "cronSecret": "cron が自身を認証するための共有秘密。十分にランダムな文字列で OK。",
+        "vapidKeyEnc": "プロジェクト毎の VAPID 秘密鍵を保存時に暗号化する 32 バイトの AES-256-GCM 鍵。下記コマンドで生成。この鍵を失うと既存プロジェクトの VAPID アイデンティティへアクセスできなくなります。",
+        "adminUserIds": "任意。/admin ダッシュボードへアクセスできる Supabase ユーザー UUID をカンマ区切りで指定。"
+      },
+      "step4": {
+        "title": "4. デプロイ",
+        "vercelLead": "Vercel: リポジトリを連携し、ステップ 3 の環境変数を設定して deploy。同梱の <code></code> が cron スケジュールを自動で配線します。",
+        "selfLead": "自前ホスト: 以下でビルド・起動:",
+        "noteCron": "Vercel 以外では <code></code> を自分でスケジュールする必要があります — ステップ 5 を参照。"
+      },
+      "step5": {
+        "title": "5. cron ワーカーをスケジュール",
+        "body": "cron ワーカーは予約通知の dispatch、Webhook 配信の再試行、レート制限テーブルの掃除を行います。約 1 分ごとに動かしてください。認証は <code></code> を Bearer トークンとして渡します。",
+        "vercel": "Vercel の場合: 同梱の <code></code> がこのスケジュールを宣言しているので、そのままで動作。",
+        "manual": "Vercel 以外: GitHub Actions、fly.io machines、crontab + curl、Kubernetes CronJob など、お好みのスケジューラで。crontab の例:"
+      },
+      "step6": {
+        "title": "6. 最初のユーザーと管理者",
+        "body": "UI からサインアップしてアカウントを作成。Supabase Studio (もしくは SQL) でユーザー UUID を取得し、<code></code> に追加すると /admin ダッシュボードが解放されます。"
+      },
+      "notes": {
+        "title": "運用上の注意",
+        "encKey": "プロジェクト作成後は <code></code> を変更しないでください。DB と一緒にバックアップを取りましょう。ローテーションには projects.vapid_private_key の再暗号化が必要です。",
+        "scaling": "通知のファンアウトは送信ルートのプロセス内で順次実行される実装です (デフォルト上限の 5,000 購読者/プロジェクト程度を想定)。それ以上に伸ばす場合はキューに切り出すことを検討してください。",
+        "tracking": "イベント追跡 (shown / clicked) は仕様上、認証なしの公開エンドポイントです (ビーコンは資格情報を送りません)。IP 単位でレート制限済み。",
+        "logs": "サーバーエラーは <code></code> に永続化され /admin に出ます。デプロイのデバッグに便利。"
+      }
+    }
+  },
+  "dashboard": {
+    "sidebar": {
+      "projects": "プロジェクト",
+      "account": "アカウント",
+      "admin": "管理",
+      "docs": "ドキュメント",
+      "signOut": "ログアウト"
+    },
+    "projectNav": {
+      "overview": "概要",
+      "notifications": "通知",
+      "subscribers": "購読者",
+      "webhooks": "Webhook",
+      "analytics": "アナリティクス",
+      "sdk": "SDK セットアップ",
+      "api": "REST API",
+      "export": "エクスポート",
+      "settings": "設定"
+    },
+    "projectsList": {
+      "title": "プロジェクト",
+      "new": "新規プロジェクト",
+      "empty": "プロジェクトがまだありません",
+      "emptyDesc": "プロジェクトを作ると VAPID 鍵が発行され、購読の受け取りを開始できます。",
+      "createdAt": "作成: {date}",
+      "subscribers": "{count} 購読者"
+    },
+    "newProject": {
+      "title": "新規プロジェクト",
+      "name": "名前",
+      "create": "作成",
+      "creating": "作成中..."
+    },
+    "account": {
+      "title": "アカウント",
+      "profile": "プロフィール",
+      "email": "メールアドレス",
+      "userId": "ユーザー ID",
+      "changePassword": "パスワード変更",
+      "dangerZone": "危険な操作"
+    },
+    "changePassword": {
+      "newPassword": "新しいパスワード",
+      "placeholder": "8 文字以上",
+      "saving": "保存中...",
+      "update": "パスワードを更新"
+    },
+    "deleteAccount": {
+      "open": "アカウントを削除…",
+      "warning": "<email></email> と、所有する全プロジェクト、それに紐づく全購読者を完全に削除します。この操作は取り消せません。",
+      "typeToConfirm": "確認のため <phrase></phrase> と入力してください",
+      "deleting": "削除中…",
+      "confirmDelete": "アカウントを完全に削除",
+      "cancel": "キャンセル"
+    },
+    "admin": {
+      "title": "管理 · 使用状況",
+      "stat": {
+        "users": "ユーザー (プロジェクト所有)",
+        "projects": "プロジェクト",
+        "subscribers": "購読者",
+        "notificationsAllTime": "通知 (累計)",
+        "notificationsThisMonth": "通知 (今月 UTC)"
+      },
+      "breakdown": {
+        "title": "プロジェクト別内訳",
+        "project": "プロジェクト",
+        "subs": "購読",
+        "sendsMo": "送信 (月)",
+        "shown": "表示",
+        "clicked": "クリック",
+        "ctr": "CTR",
+        "created": "作成",
+        "empty": "プロジェクトがありません。"
+      },
+      "errors": {
+        "title": "最近のエラー (全プロジェクト)",
+        "empty": "エラーは記録されていません。"
+      }
+    },
+    "projectOverview": {
+      "createdAt": "作成: {date}",
+      "send": "通知を送信",
+      "stat": {
+        "subscribers": "購読者",
+        "sendsThisMonth": "今月の送信",
+        "totalShown": "表示回数 (合計)",
+        "ctr": "クリック率",
+        "clicks": "{count} クリック"
+      },
+      "recent": {
+        "title": "最近の通知",
+        "viewAll": "すべて表示 →",
+        "empty": "まだ通知を送信していません。",
+        "shownClicked": "表示 {shown} · クリック {clicked}"
+      }
+    },
+    "notificationsPage": { "title": "通知", "send": "通知を送信" },
+    "subscribersPage": {
+      "heading": "{name} · 購読者",
+      "total": "合計 {count}",
+      "back": "← プロジェクトに戻る",
+      "search": "検索",
+      "searchPlaceholder": "ユーザー ID または endpoint で検索…",
+      "searchButton": "検索",
+      "clear": "クリア",
+      "anonymous": "(匿名)",
+      "noMatches": "該当する購読者がいません",
+      "noMatchesDesc": "ユーザー ID または endpoint の一部で検索してみてください。",
+      "empty": "購読者はまだいません",
+      "emptyDesc": "SDK をアプリに組み込むと、ユーザーが通知許可した時点でここに表示されます。",
+      "emptyCta": "クイックスタートを開く",
+      "page": "{page} / {lastPage} ページ",
+      "prev": "← 前へ",
+      "next": "次へ →"
+    },
+    "webhooksPage": { "title": "Webhook" },
+    "analyticsPage": {
+      "title": "アナリティクス",
+      "errors": "最近のエラー",
+      "noErrors": "エラーは記録されていません。"
+    },
+    "sdkPage": { "title": "SDK セットアップ" },
+    "apiPage": { "title": "REST API" },
+    "exportPage": { "title": "エクスポート" },
+    "settingsPage": {
+      "title": "設定",
+      "info": "プロジェクト情報",
+      "name": "名前",
+      "id": "ID",
+      "vapidSubject": "VAPID subject",
+      "created": "作成日時",
+      "dangerZone": "危険な操作",
+      "dangerDesc": "このプロジェクト、購読者、通知履歴をすべて完全に削除します。"
+    },
+    "copy": {
+      "copy": "コピー",
+      "copied": "コピー済み",
+      "copiedLabel": "{label} をコピーしました",
+      "failed": "コピーに失敗しました"
+    },
+    "exportCard": {
+      "title": "エクスポート",
+      "desc": "ベンダーロックインなし — いつでも CSV でデータをダウンロードできます。",
+      "subscribers": "購読者 CSV",
+      "notifications": "通知 CSV"
+    },
+    "deleteProject": {
+      "confirm": "「{name}」を削除しますか? この操作は取り消せません。",
+      "delete": "削除",
+      "deleting": "削除中...",
+      "failed": "削除に失敗しました"
+    },
+    "deleteNotification": {
+      "cancel": "キャンセル",
+      "delete": "削除",
+      "confirmCancel": "この予約通知をキャンセルしますか?",
+      "confirmDelete": "この通知を履歴から削除しますか?",
+      "failed": "失敗"
+    },
+    "projectName": {
+      "rename": "名前を変更",
+      "saving": "保存中…",
+      "save": "保存",
+      "cancel": "キャンセル"
+    },
+    "sdkSetup": {
+      "title": "SDK セットアップ",
+      "fullRef": "完全なリファレンスは <link>/docs</link> へ。",
+      "example": "サンプル",
+      "snippet": "スニペット"
+    },
+    "apiKey": {
+      "title": "REST API",
+      "apiKey": "API キー",
+      "show": "表示",
+      "hide": "隠す",
+      "regenerate": "再生成",
+      "regenerateConfirm": "API キーを再生成しますか? 現在のキーを使用中のクライアントは即座に動作しなくなります。",
+      "regenerated": "API キーを再生成しました",
+      "regenerateFailed": "再生成に失敗しました",
+      "sendViaCurl": "curl で送信",
+      "snippet": "スニペット"
+    },
+    "defaults": {
+      "title": "通知のデフォルト",
+      "desc": "通知が icon / badge を指定せずに送信された場合に使われます。空欄なら OS のデフォルトを使用します。",
+      "defaultIcon": "デフォルト icon URL",
+      "defaultBadge": "デフォルト badge URL",
+      "saved": "保存しました。",
+      "saving": "保存中...",
+      "save": "デフォルトを保存"
+    },
+    "notificationsList": {
+      "title": "履歴",
+      "empty": "まだ通知がありません",
+      "emptyDesc": "このダッシュボードか REST API から最初のプッシュを送ると、配信状況がここに表示されます。",
+      "emptyCta": "通知を送信",
+      "status": { "sent": "送信済み", "scheduled": "予約", "pending": "保留中" },
+      "scheduledFor": "予約: {date}",
+      "sentAt": "送信: {date}",
+      "targeted": "ターゲット: {count} ユーザー",
+      "stats": "配信 {delivered} · 表示 {shown} · クリック {clicked}",
+      "removed": "削除 {count}",
+      "failed": "失敗 {count}",
+      "resend": "再送信"
+    },
+    "analyticsChart": {
+      "title": "過去 {days} 日間",
+      "notifications": "通知数",
+      "delivered": "配信",
+      "shown": "表示",
+      "clicked": "クリック",
+      "ofDelivered": "配信の {rate}%",
+      "ofShown": "表示の {rate}%",
+      "tooltip": "{date} — 送信 {sent} · 配信 {delivered} · 表示 {shown} · クリック {clicked}",
+      "legend": "日次配信数 (ホバーで詳細)"
+    },
+    "webhookCard": {
+      "title": "Webhook",
+      "intro": "有効な Webhook は、送信成功のたびに署名付きの <post></post> を受信します。<sig></sig> (<hmac></hmac>) で検証してください。詳細は <docs>/docs</docs>。",
+      "empty": "Webhook がまだありません。",
+      "events": "イベント",
+      "eventsHint": "すべてチェックしておくと全イベント種別を受信します。",
+      "add": "Webhook を追加",
+      "newWebhook": "新規 Webhook",
+      "endpointUrl": "エンドポイント URL",
+      "nameOpt": "名前 (任意)",
+      "creating": "作成中…",
+      "create": "作成",
+      "cancel": "キャンセル",
+      "urlLabel": "URL",
+      "nameLabel": "名前",
+      "enabled": "有効",
+      "saving": "保存中…",
+      "save": "保存",
+      "sending": "送信中…",
+      "sendTest": "テスト送信",
+      "deleting": "削除中…",
+      "delete": "削除",
+      "deleteConfirm": "この Webhook を削除しますか?",
+      "signingSecret": "署名シークレット",
+      "show": "表示",
+      "hide": "隠す",
+      "secret": "シークレット",
+      "rotating": "ローテート中…",
+      "rotate": "ローテート",
+      "rotateConfirm": "署名シークレットをローテートしますか? 既存の受信側は更新するまで動作しなくなります。",
+      "noDeliveriesYet": "配信履歴はまだありません。",
+      "lastDelivery": "最終配信 {date}",
+      "networkError": "ネットワークエラー",
+      "noLogged": "配信ログはまだありません。",
+      "hideDeliveries": "配信を隠す",
+      "recentDeliveries": "最近の配信 ({count})",
+      "attempt": "試行 {n}",
+      "retryAt": "再試行 {time}",
+      "netErr": "通信失敗"
+    },
+    "deleteSubscription": {
+      "confirm": "この購読を削除しますか? ブラウザは通知を受信しなくなります。",
+      "removing": "削除中…",
+      "remove": "削除"
+    },
+    "newNotification": {
+      "title": "新規通知",
+      "titleField": "タイトル",
+      "body": "本文",
+      "url": "URL (任意)",
+      "visuals": "ビジュアル (任意)",
+      "iconUrl": "Icon URL",
+      "iconHint": "通知の横に表示される小さなアイコン (192×192 PNG 推奨)。",
+      "imageUrl": "Image URL",
+      "imageHint": "本文に表示される大きな画像 (Android と一部のデスクトップブラウザのみ)。",
+      "badgeUrl": "Badge URL",
+      "badgeHint": "システムトレイに表示されるモノクロアイコン (Android のみ)。",
+      "send": "送信",
+      "immediately": "今すぐ",
+      "atSpecificTime": "指定日時に",
+      "targetUserIds": "ターゲットユーザー ID (任意)",
+      "targetPlaceholder": "空ならブロードキャスト。それ以外はカンマ区切りまたは改行区切り。",
+      "targetHint": "SDK 経由で設定された <code></code> がこのリストに含まれる購読のみが対象。空 = 全員に送信。",
+      "scheduledAt": "予約日時 (ローカル時刻)",
+      "sending": "送信中...",
+      "sendNow": "今すぐ送信",
+      "schedule": "予約"
+    },
+    "notificationPreview": {
+      "placeholderTitle": "通知タイトル",
+      "placeholderBody": "通知の本文がここに表示されます。",
+      "livePreview": "ライブプレビュー",
+      "now": "たった今",
+      "disclaimer": "デスクトップでの大まかなレンダリングです。実際の表示はブラウザと OS に依存します。"
+    },
+    "deliveryDetail": {
+      "title": "配信詳細",
+      "back": "← プロジェクトに戻る",
+      "summary": "サマリ",
+      "event": "イベント",
+      "status": "ステータス",
+      "networkError": "ネットワークエラー",
+      "attempts": "試行回数",
+      "nextRetry": "次回再試行",
+      "url": "URL",
+      "request": "リクエスト",
+      "response": "レスポンス",
+      "noBody": "(レスポンスボディなし)"
+    }
+  }
+}
