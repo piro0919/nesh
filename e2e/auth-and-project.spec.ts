@@ -28,12 +28,13 @@ test("sign up, create a project, and see SDK setup", async ({ page }) => {
   await page.getByLabel("Name").fill(projectName);
   await page.getByRole("button", { name: /^create/i }).click();
 
-  // Land on the project page — VAPID keys auto-generated, SDK setup card visible.
+  // Land on the project overview. VAPID keys are auto-generated and surfaced
+  // on the dedicated SDK setup sub-route.
   await page.waitForURL(/\/projects\/[0-9a-f-]{36}\b/, { timeout: 15_000 });
   await expect(page.getByRole("heading", { name: projectName })).toBeVisible();
-  await expect(page.getByText("SDK setup")).toBeVisible();
-  // The SDK setup card includes a labelled "apiBase" row plus a code snippet
-  // — `.first()` matches either, both are evidence the card rendered.
+  const projectId = page.url().match(/\/projects\/([0-9a-f-]{36})/)![1];
+  await page.goto(`/projects/${projectId}/sdk`);
+  await expect(page.getByRole("heading", { name: /SDK setup/i }).first()).toBeVisible();
   await expect(page.getByText(/apiBase/).first()).toBeVisible();
 
   // Sign out from the header

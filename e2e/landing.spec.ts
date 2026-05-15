@@ -9,7 +9,7 @@ test.describe("landing page", () => {
     // Multiple "Start free" CTAs (header, hero, final) — assert at least one is visible.
     await expect(page.getByRole("link", { name: "Start free" }).first()).toBeVisible();
     await expect(page.getByRole("link", { name: "Read the docs" }).first()).toBeVisible();
-    await expect(page.getByRole("heading", { name: /Where Nesh fits/ })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Web Push only/ })).toBeVisible();
     await expect(page.getByRole("heading", { name: /From signup to first send/ })).toBeVisible();
     await expect(page.getByRole("heading", { name: "FAQ" })).toBeVisible();
   });

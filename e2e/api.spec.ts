@@ -1,3 +1,4 @@
+import { generateKeyPairSync, randomBytes } from "node:crypto";
 import type { APIRequestContext, Page } from "@playwright/test";
 import { expect, test } from "@playwright/test";
 
@@ -35,14 +36,16 @@ async function setup(page: Page): Promise<Setup> {
   const url = page.url();
   const projectId = url.match(/\/projects\/([0-9a-f-]{36})/)![1];
 
-  // VAPID public key — visible label in the SDK setup card.
+  // VAPID public key lives on the dedicated SDK setup sub-route.
+  await page.goto(`/projects/${projectId}/sdk`);
   const vapidPublicKey = await page
     .locator("code", { hasText: /^B[A-Za-z0-9_-]{80,}$/ })
     .first()
     .textContent();
   expect(vapidPublicKey).toMatch(/^B[A-Za-z0-9_-]+$/);
 
-  // Reveal + read the API key.
+  // API key lives on the REST API sub-route; click "Show" to reveal it.
+  await page.goto(`/projects/${projectId}/api`);
   await page
     .getByRole("button", { name: /^show$/i })
     .first()
@@ -56,13 +59,25 @@ async function setup(page: Page): Promise<Setup> {
   return { projectId, apiKey: apiKey!, vapidPublicKey: vapidPublicKey! };
 }
 
+/**
+ * Mint a realistic browser-shaped PushSubscription. Uses a real P-256 keypair
+ * so the 65-byte uncompressed public key passes web-push's length validation
+ * end-to-end — the previous `BPm.padEnd(86, "x")` hack was rejected by the
+ * server-side send pipeline and inflated the `failed` counter.
+ *
+ * The endpoint host is a sink we don't control, so an actual send attempt
+ * resolves as `removed` / `failed`, not `sent`. That's still the correct shape
+ * for asserting the API contract.
+ */
 function fakeSubscription(suffix: string) {
+  const { publicKey } = generateKeyPairSync("ec", { namedCurve: "prime256v1" });
+  const raw = publicKey.export({ format: "der", type: "spki" });
+  // Strip 26-byte SPKI prefix → 65-byte uncompressed point starting with 0x04.
+  const p256dh = raw.subarray(raw.length - 65).toString("base64url");
+  const auth = randomBytes(16).toString("base64url");
   return {
     endpoint: `https://fcm.googleapis.com/fcm/send/test-${suffix}-${Date.now()}`,
-    keys: {
-      p256dh: "BPm".padEnd(86, "x"), // 65-byte base64url-ish
-      auth: "abc".padEnd(22, "y"),
-    },
+    keys: { p256dh, auth },
   };
 }
 
@@ -141,6 +156,11 @@ test.describe
         removed: expect.any(Number),
         failed: expect.any(Number),
       });
+      // Counters must be self-consistent: every attempted subscription is
+      // resolved as exactly one of delivered / removed / failed.
+      expect(body.delivered + body.removed + body.failed).toBe(body.attempted);
+      // At least the subscription minted in test 1 should have been attempted.
+      expect(body.attempted).toBeGreaterThanOrEqual(1);
     });
 
     test("Events endpoint accepts shown / clicked (200) and rejects bad type (400)", async () => {

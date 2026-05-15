@@ -1,5 +1,6 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
-import { type AddressInfo, createServer, type Server } from "node:http";
+import { createServer, type Server } from "node:http";
+import type { AddressInfo } from "node:net";
 import type { APIRequestContext, Page } from "@playwright/test";
 import { expect, test } from "@playwright/test";
 
@@ -53,7 +54,8 @@ async function setup(page: Page): Promise<{ projectId: string; apiKey: string; s
   await page.waitForURL(/\/projects\/[0-9a-f-]{36}\b/, { timeout: 15_000 });
   const projectId = page.url().match(/\/projects\/([0-9a-f-]{36})/)![1];
 
-  // Reveal API key (first "Show" button on the page is the API key card).
+  // API key now lives on the dedicated REST API sub-route.
+  await page.goto(`/projects/${projectId}/api`);
   await page
     .getByRole("button", { name: /^show$/i })
     .first()
@@ -66,8 +68,10 @@ async function setup(page: Page): Promise<{ projectId: string; apiKey: string; s
   return { projectId, apiKey, secret: "" };
 }
 
-async function configureWebhook(page: Page, url: string): Promise<string> {
-  // Open the create-webhook form, fill it, submit.
+async function configureWebhook(page: Page, projectId: string, url: string): Promise<string> {
+  // Webhook UI lives at /projects/<id>/webhooks now that the project page has
+  // been split into sub-routes.
+  await page.goto(`/projects/${projectId}/webhooks`);
   await page.getByRole("button", { name: /^add webhook$/i }).click();
   await page.getByLabel("Endpoint URL").fill(url);
   await page.getByRole("button", { name: /^create$/i }).click();
@@ -76,11 +80,10 @@ async function configureWebhook(page: Page, url: string): Promise<string> {
   await page.waitForTimeout(300);
   await page.reload();
 
-  // Reveal the secret. The first "Show" belongs to the API key card; the
-  // second to the webhook secret row.
+  // Reveal the secret — only one "Show" button on the webhooks sub-route.
   await page
     .getByRole("button", { name: /^show$/i })
-    .nth(1)
+    .first()
     .click();
   const secret = (await page
     .locator("code", { hasText: /^whsec_/ })
@@ -112,7 +115,7 @@ test.describe
       const s = await setup(page);
       projectId = s.projectId;
       apiKey = s.apiKey;
-      secret = await configureWebhook(page, receiver.url());
+      secret = await configureWebhook(page, projectId, receiver.url());
       await ctx.close();
 
       request = await playwright.request.newContext({
