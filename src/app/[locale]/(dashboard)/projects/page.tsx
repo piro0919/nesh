@@ -1,6 +1,7 @@
 import { FolderPlus } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import { EmptyState } from "@/components/empty-state";
+import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
@@ -19,12 +20,14 @@ export default async function Page() {
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">{t("title")}</h1>
-        <Button asChild>
-          <Link href="/projects/new">{t("new")}</Link>
-        </Button>
-      </div>
+      <PageHeader
+        title={t("title")}
+        actions={
+          <Button asChild>
+            <Link href="/projects/new">{t("new")}</Link>
+          </Button>
+        }
+      />
       {projects.length === 0 ? (
         <EmptyState
           icon={FolderPlus}

@@ -1,11 +1,13 @@
 import { cookies } from "next/headers";
 import Image from "next/image";
+import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Link } from "@/i18n/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { AppSidebar } from "./_components/app-sidebar";
+import { Breadcrumbs } from "./_components/breadcrumbs";
 import { MobileBottomNav } from "./_components/mobile-bottom-nav";
 import { UserMenu } from "./_components/user-menu";
 
@@ -37,9 +39,11 @@ export default async function DashboardLayout({ children }: { children: React.Re
       <SidebarProvider defaultOpen={defaultOpen}>
         <AppSidebar email={email} isAdmin={isAdmin} projects={projects ?? []} />
         <SidebarInset>
-          {/* Desktop: SidebarTrigger only (sidebar carries the nav) */}
-          <header className="hidden h-12 items-center gap-2 border-b px-4 md:flex">
-            <SidebarTrigger />
+          {/* Desktop: sticky SiteHeader with SidebarTrigger + Breadcrumb */}
+          <header className="sticky top-0 z-30 hidden h-12 items-center gap-2 border-b bg-background/95 px-4 backdrop-blur md:flex">
+            <SidebarTrigger className="-ml-1" />
+            <Separator orientation="vertical" className="mx-1 h-4" />
+            <Breadcrumbs projects={projects ?? []} />
           </header>
           {/* Mobile: logo + UserMenu avatar (bottom nav carries the rest) */}
           <header className="flex h-14 items-center justify-between border-b px-4 md:hidden">

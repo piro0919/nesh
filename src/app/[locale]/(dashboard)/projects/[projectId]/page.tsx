@@ -1,6 +1,7 @@
 import { Bell, Send, Users, Webhook } from "lucide-react";
 import { notFound } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
+import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
@@ -60,19 +61,19 @@ export default async function Page({ params }: Props) {
 
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-semibold">{project.name}</h1>
-          <p className="text-xs text-muted-foreground">
-            {t("createdAt", { date: new Date(project.created_at).toLocaleDateString(locale) })}
-          </p>
-        </div>
-        <Button asChild>
-          <Link href={`/projects/${project.id}/notifications/new`}>
-            <Send /> {t("send")}
-          </Link>
-        </Button>
-      </div>
+      <PageHeader
+        title={project.name}
+        description={t("createdAt", {
+          date: new Date(project.created_at).toLocaleDateString(locale),
+        })}
+        actions={
+          <Button asChild>
+            <Link href={`/projects/${project.id}/notifications/new`}>
+              <Send /> {t("send")}
+            </Link>
+          </Button>
+        }
+      />
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Stat
