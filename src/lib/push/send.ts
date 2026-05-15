@@ -47,7 +47,13 @@ export async function sendToProject(
     ? await decryptString(project.vapid_private_key)
     : project.vapid_private_key;
 
-  webpush.setVapidDetails(project.vapid_subject, project.vapid_public_key, privateKey);
+  // Pass VAPID per-call instead of webpush.setVapidDetails() (global mutable state)
+  // so concurrent sends across different projects don't trample each other's keys.
+  const vapidDetails = {
+    subject: project.vapid_subject,
+    publicKey: project.vapid_public_key,
+    privateKey,
+  };
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://nesh.kkweb.io";
   const eventBase = `${siteUrl}/api/v1/projects/${projectId}/notifications/${notificationId}/events`;
@@ -77,6 +83,7 @@ export async function sendToProject(
       await webpush.sendNotification(
         { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
         payload,
+        { vapidDetails },
       );
       sent++;
     } catch (error) {
