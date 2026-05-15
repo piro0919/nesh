@@ -29,7 +29,7 @@ If you've ever needed Web Push notifications for a side project and found OneSig
 
 Nesh is **to OneSignal what Umami is to Google Analytics** — a smaller, friendlier alternative for people who don't need the enterprise features.
 
-> Hosted at **[nesh.kkweb.io](https://nesh.kkweb.io)** · Free during early access · MIT licensed · Built by a solo developer
+> Hosted at **[nesh.kkweb.io](https://nesh.kkweb.io)** · Docs at **[nesh.kkweb.io/docs](https://nesh.kkweb.io/docs)** · Free during early access · MIT licensed · Built by a solo developer
 
 <p align="center">
   <img src="public/dashboard-preview.png" alt="Nesh dashboard preview" width="900" />
@@ -105,17 +105,18 @@ If you'd hit those ceilings, please open an issue — long-term pricing isn't de
 
 ## Stack
 
-- **Next.js 16** (App Router, Server Actions, the new `proxy.ts`)
+- **Next.js 16** (App Router, Server Actions, the new `proxy.ts`) on **React 19**
 - **Supabase** (Postgres + Auth + RLS)
 - **Vercel** (hosting + Cron for scheduled sends)
-- **shadcn/ui** + **Tailwind v4**
+- **shadcn/ui** + **Tailwind v4** with system / light / dark theme via `next-themes`
+- **next-intl** for English / 日本語
 - **[`@piro0919/next-push`](https://github.com/piro0919/next-push)** for the actual sending (web-push + VAPID)
 
-VAPID private keys are stored AES-256-GCM encrypted at rest. Subscriptions optionally carry an `external_user_id` for targeted sends.
+VAPID private keys are stored AES-256-GCM encrypted at rest. Subscriptions optionally carry an `external_user_id` for targeted sends. Webhooks fire HMAC-SHA256-signed `notification.sent` / `subscription.created` / `subscription.removed` events.
 
 ## Self-host
 
-Nesh runs anywhere with Postgres + a place to host Next.js. The schema is in [`supabase/migrations`](supabase/migrations).
+Nesh is MIT-licensed and runs anywhere with Postgres + a Node-compatible host. See the full **[self-hosting guide](https://nesh.kkweb.io/docs/self-host)** for step-by-step instructions, including required env vars, cron scheduling outside Vercel, and operational notes.
 
 ### Local development
 
@@ -134,16 +135,18 @@ Other scripts:
 - `pnpm db:types` — regenerate `src/lib/supabase/database.types.ts` from the local schema
 - `pnpm db:stop` — stop the local Supabase stack
 - `pnpm lint` / `pnpm format` — Biome
+- `pnpm test` / `pnpm test:e2e` — vitest / Playwright
 
 ### Required environment variables
 
 | Variable | Purpose |
 | --- | --- |
 | `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Browser-side Supabase client |
-| `SUPABASE_SERVICE_ROLE_KEY` | Server-side admin client |
-| `NEXT_PUBLIC_SITE_URL` | Used for Auth redirect URLs |
+| `SUPABASE_SERVICE_ROLE_KEY` | Server-side admin client (bypasses RLS) |
+| `NEXT_PUBLIC_SITE_URL` | Public origin — used for apiBase + event tracking URLs |
 | `CRON_SECRET` | Bearer token guarding `/api/cron/dispatch` |
 | `VAPID_KEY_ENCRYPTION_KEY` | 32-byte base64 key for at-rest VAPID encryption |
+| `ADMIN_USER_IDS` | Optional. Comma-separated user UUIDs that can access `/admin` |
 
 ## Contributing
 
