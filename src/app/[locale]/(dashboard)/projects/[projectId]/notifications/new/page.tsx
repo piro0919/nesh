@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { use, useActionState, useState } from "react";
+import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -42,8 +43,8 @@ export default function Page({ params, searchParams }: Props) {
 
   return (
     <div className="mx-auto grid w-full max-w-5xl gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,360px)]">
-      <form action={formAction} className="flex w-full flex-col gap-4">
-        <h1 className="text-2xl font-semibold">{t("title")}</h1>
+      <form action={formAction} className="flex w-full flex-col gap-6">
+        <PageHeader title={t("title")} />
 
         <div className="flex flex-col gap-2">
           <Label htmlFor="title">{t("titleField")}</Label>

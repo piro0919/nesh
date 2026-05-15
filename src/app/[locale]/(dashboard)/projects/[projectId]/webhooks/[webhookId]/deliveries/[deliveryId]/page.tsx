@@ -1,8 +1,7 @@
 import { notFound } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
-import { Button } from "@/components/ui/button";
+import { PageHeader } from "@/components/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { signPayload } from "@/lib/webhooks";
 
@@ -63,17 +62,10 @@ export default async function Page({ params }: Props) {
 
   return (
     <div className="mx-auto flex w-full max-w-4xl flex-col gap-6">
-      <div className="flex items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold">{t("title")}</h1>
-          <p className="text-sm text-muted-foreground">
-            {webhook.name ?? webhook.url} · {new Date(delivery.created_at).toLocaleString(locale)}
-          </p>
-        </div>
-        <Button asChild variant="outline" size="sm">
-          <Link href={`/projects/${project.id}`}>{t("back")}</Link>
-        </Button>
-      </div>
+      <PageHeader
+        title={t("title")}
+        description={`${webhook.name ?? webhook.url} · ${new Date(delivery.created_at).toLocaleString(locale)}`}
+      />
 
       <Card>
         <CardHeader>

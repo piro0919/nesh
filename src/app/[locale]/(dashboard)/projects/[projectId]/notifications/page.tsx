@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
@@ -21,12 +22,14 @@ export default async function Page({ params }: Props) {
 
   return (
     <div className="mx-auto flex w-full max-w-4xl flex-col gap-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">{t("title")}</h1>
-        <Button asChild size="sm">
-          <Link href={`/projects/${project.id}/notifications/new`}>{t("send")}</Link>
-        </Button>
-      </div>
+      <PageHeader
+        title={t("title")}
+        actions={
+          <Button asChild size="sm">
+            <Link href={`/projects/${project.id}/notifications/new`}>{t("send")}</Link>
+          </Button>
+        }
+      />
       <NotificationsList projectId={project.id} />
     </div>
   );

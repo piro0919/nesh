@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { PageHeader } from "@/components/page-header";
 import { getSiteUrl } from "@/lib/site-url";
 import { createClient } from "@/lib/supabase/server";
 import { ApiKeyCard } from "../_components/api-key-card";
@@ -22,7 +23,7 @@ export default async function Page({ params }: Props) {
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
-      <h1 className="text-2xl font-semibold">{t("title")}</h1>
+      <PageHeader title={t("title")} />
       <ApiKeyCard projectId={project.id} apiKey={project.api_key} apiBase={apiBase} />
     </div>
   );

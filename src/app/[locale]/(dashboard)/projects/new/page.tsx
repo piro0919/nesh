@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { useActionState } from "react";
+import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,8 +16,8 @@ export default function Page() {
   );
 
   return (
-    <form action={formAction} className="mx-auto flex w-full max-w-md flex-col gap-4">
-      <h1 className="text-2xl font-semibold">{t("title")}</h1>
+    <form action={formAction} className="mx-auto flex w-full max-w-md flex-col gap-6">
+      <PageHeader title={t("title")} />
       <div className="flex flex-col gap-2">
         <Label htmlFor="name">{t("name")}</Label>
         <Input id="name" name="name" required maxLength={100} autoFocus />

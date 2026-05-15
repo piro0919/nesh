@@ -1,4 +1,5 @@
 import { getLocale, getTranslations } from "next-intl/server";
+import { PageHeader } from "@/components/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
 import { requireAdmin } from "@/lib/is-admin";
@@ -90,7 +91,7 @@ export default async function Page() {
 
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
-      <h1 className="text-2xl font-semibold">{t("title")}</h1>
+      <PageHeader title={t("title")} />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Stat label={t("stat.users")} value={uniqueUsers} />

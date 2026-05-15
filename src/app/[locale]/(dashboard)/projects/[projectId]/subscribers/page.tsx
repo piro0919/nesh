@@ -2,6 +2,7 @@ import { SearchX, UsersRound } from "lucide-react";
 import { notFound } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
 import { EmptyState } from "@/components/empty-state";
+import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -53,17 +54,10 @@ export default async function Page({ params, searchParams }: Props) {
 
   return (
     <div className="mx-auto flex w-full max-w-4xl flex-col gap-6">
-      <div className="flex items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold">{t("heading", { name: project.name })}</h1>
-          <p className="text-sm text-muted-foreground">
-            {t("total", { count: total.toLocaleString(locale) })}
-          </p>
-        </div>
-        <Button asChild variant="outline" size="sm">
-          <Link href={`/projects/${project.id}`}>{t("back")}</Link>
-        </Button>
-      </div>
+      <PageHeader
+        title={t("heading", { name: project.name })}
+        description={t("total", { count: total.toLocaleString(locale) })}
+      />
 
       <Card>
         <CardHeader>
