@@ -40,7 +40,9 @@ test("sign up, create a project, and see SDK setup", async ({ page }) => {
   await expect(page.getByRole("heading", { name: /SDK setup/i }).first()).toBeVisible();
   await expect(page.getByText(/apiBase/).first()).toBeVisible();
 
-  // Sign out from the header
-  await page.getByRole("button", { name: /sign out/i }).click();
+  // Sign out. The action lives in the account menu in the sidebar footer, whose
+  // trigger is labelled with the signed-in email.
+  await page.getByRole("button").filter({ hasText: email }).click();
+  await page.getByRole("menuitem", { name: /sign out/i }).click();
   await expect(page).toHaveURL(/\/sign-in/);
 });
