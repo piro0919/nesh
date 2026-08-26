@@ -1,3 +1,11 @@
-ignoredBuiltDependencies:
-  - sharp
-  - unrs-resolver
+# pnpm 11 removed ignoredBuiltDependencies in favour of allowBuilds, and fails
+# the install outright unless every package with a build script is listed.
+# None of these are needed: Next ships its own SWC binary, nothing watches with
+# @parcel/watcher, msw is only used in node tests (no service worker file), and
+# sharp / unrs-resolver were already opted out under pnpm 10.
+allowBuilds:
+  "@parcel/watcher": false
+  "@swc/core": false
+  msw: false
+  sharp: false
+  unrs-resolver: false
