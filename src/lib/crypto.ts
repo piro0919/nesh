@@ -1,8 +1,8 @@
 import { webcrypto } from "node:crypto";
 
-let cachedKey: CryptoKey | null = null;
+let cachedKey: webcrypto.CryptoKey | null = null;
 
-async function getKey(): Promise<CryptoKey> {
+async function getKey(): Promise<webcrypto.CryptoKey> {
   if (cachedKey) return cachedKey;
   const raw = process.env.VAPID_KEY_ENCRYPTION_KEY;
   if (!raw) throw new Error("VAPID_KEY_ENCRYPTION_KEY is not set");
