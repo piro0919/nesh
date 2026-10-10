@@ -41,6 +41,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.10",
+    "@piro0919/biome-config": "github:piro0919/biome-config#v1.0.0",
     "@playwright/test": "^1.62.1",
     "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "^24.13.3",
