@@ -10,6 +10,8 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: process.env.CI ? [["html", { open: "never" }], ["list"]] : "list",
   use: {
+    // ブラウザは Chrome 本体を使う。Chrome for Testing は入れない
+    channel: "chrome",
     baseURL,
     trace: "on-first-retry",
   },
