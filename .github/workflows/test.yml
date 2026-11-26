@@ -59,7 +59,7 @@ jobs:
           cache: pnpm
       - uses: supabase/setup-cli@v1
         with:
-          version: latest
+          version: 2.84.2
       - name: Start local Supabase
         run: supabase start
       - name: Capture Supabase anon + service-role keys
